@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError
 import os
 
-from models import db, connect_db, User, Headline, Source, Rewrite
+from server.models import db, connect_db, User, Headline, Source, Rewrite
 
 # from forms import RewriteForm
 

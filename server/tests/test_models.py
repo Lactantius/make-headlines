@@ -2,10 +2,12 @@ from flask import Flask
 
 import os
 from unittest import TestCase
+from flask.testing import FlaskClient
 from sqlalchemy.exc import IntegrityError
 import pytest
 
-from models import db, User, Headline, Source, Rewrite, new_user
+from server.models import db, User, Headline, Source, Rewrite, new_user
+from server.app import app
 
 
 #############################################
@@ -13,11 +15,12 @@ from models import db, User, Headline, Source, Rewrite, new_user
 #
 
 
-def test_new_user(add_user: User):
+def test_new_user(add_user: User, client: FlaskClient):
     """Can a user be created?"""
 
     u = add_user
     assert u.username == "test_user"
+    assert u.hashed_pwd != "PASSWORD"
 
 
 #############################################
@@ -26,10 +29,8 @@ def test_new_user(add_user: User):
 
 
 @pytest.fixture
-def set_variables_for_tests():
+def client() -> FlaskClient:
     # os.environ["DATABASE_URL"] = "postgresql:///warbler_test"
-
-    from app import app
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///headlines_test"
 
@@ -41,7 +42,7 @@ def set_variables_for_tests():
     # once for all tests --- in each test, we'll delete the data
     # and create fresh new clean test data
     db.create_all()
-    return app
+    return app.test_client()
 
 
 @pytest.fixture
