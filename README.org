@@ -1,0 +1,7 @@
+#+title: Readme
+
+Rewrite headlines from news organizations to change the positive/negative sentiment.
+
+** TODO
+
+- [ ] Flair pulls in dozens of dependencies, most of the unnecessary. Remove them from production.
