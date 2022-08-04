@@ -2,10 +2,11 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import backref
 import uuid
 from flask_bcrypt import Bcrypt
 
-from datetime import datetime
+from datetime import date, datetime
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -16,6 +17,11 @@ def connect_db(app):
 
     db.app = app
     db.init_app(app)
+
+
+##############################################################################
+# User
+#
 
 
 class User(db.Model):
@@ -30,6 +36,11 @@ class User(db.Model):
     email = db.Column(db.String(100), nullable=False)
 
     hashed_pwd = db.Column(db.String, nullable=False)
+
+
+##############################################################################
+# Headline
+#
 
 
 class Headline(db.Model):
@@ -48,6 +59,27 @@ class Headline(db.Model):
     source_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("sources.id"), nullable=False
     )
+
+    source = db.relationship(
+        "Source", backref=backref("headlines", cascade="all, delete")
+    )
+
+
+def new_headline(text: str, date: date, source_id: UUID) -> Headline:
+    """
+    Make new headline object
+    Does not store headline in database
+    """
+
+    score = calc_sentiment_score("text")
+
+    return Headline(text=text, date=date, source_id=source_id, score=score)
+
+
+def calc_sentiment_score(text: str) -> float:
+    """TODO Use Flair to actually calculate this."""
+
+    return 1.0
 
 
 class Source(db.Model):
@@ -88,7 +120,7 @@ class Rewrite(db.Model):
 #
 
 
-def new_user(username, email, pwd):
+def new_user(username, email, pwd) -> User:
     """
     Register user, add attach hashed password, and return user.
     Does not store user in database.
