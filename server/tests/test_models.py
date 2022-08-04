@@ -8,7 +8,16 @@ from flask.testing import FlaskClient
 from sqlalchemy.exc import IntegrityError
 import pytest
 
-from server.models import db, User, Headline, Source, Rewrite, new_user, new_headline
+from server.models import (
+    db,
+    User,
+    Headline,
+    Source,
+    Rewrite,
+    new_rewrite,
+    new_user,
+    new_headline,
+)
 from server.app import app
 
 ##############################################################################
@@ -39,9 +48,26 @@ def test_new_headline(client: FlaskClient, add_headline: Headline) -> None:
 
     h = add_headline
     assert h.text == "A terrible thing happened"
-    assert h.score == 1.0
+    assert h.sentiment_score == 1.0
     assert h.source.name == "Amazing News"
     assert Headline.query.count() == 2
+
+
+##############################################################################
+# Rewrite model tests
+#
+
+
+def test_new_rewrite(add_rewrite: Rewrite) -> None:
+    """Can a rewrite be added?"""
+
+    r = add_rewrite
+    assert r.text == "A good thing happened"
+    assert r.semantic_match == 1.0
+    assert r.sentiment_score == 1.0
+    assert r.user.username == "seed_user"
+    assert r.headline.text == "A great thing happened"
+    assert Rewrite.query.count() == 2
 
 
 ##############################################################################
@@ -73,6 +99,12 @@ def seed_database() -> None:
         text="A great thing happened", date=date.today(), source_id=source.id
     )
     db.session.add(headline)
+    db.session.commit()
+
+    rewrite = new_rewrite(
+        text="An ok thing happened", headline=headline, user_id=user.id
+    )
+    db.session.add(rewrite)
     db.session.commit()
 
 
@@ -115,7 +147,7 @@ def add_source() -> Source:
 
 @pytest.fixture
 def add_headline() -> Headline:
-    """Add a headline adn store in database"""
+    """Add a headline and store in database"""
 
     source = Source.query.filter(Source.name == "Amazing News").one()
     headline = new_headline(
@@ -124,3 +156,18 @@ def add_headline() -> Headline:
     db.session.add(headline)
     db.session.commit()
     return headline
+
+
+@pytest.fixture
+def add_rewrite() -> Rewrite:
+    """Add a rewrite and store in database"""
+
+    user = User.query.filter(User.username == "seed_user").one()
+    headline = Headline.query.filter(Headline.text == "A great thing happened").one()
+
+    rewrite = new_rewrite(
+        text="A good thing happened", headline=headline, user_id=user.id
+    )
+    db.session.add(rewrite)
+    db.session.commit()
+    return rewrite
