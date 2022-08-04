@@ -29,7 +29,7 @@ def test_new_user(client: FlaskClient, add_user: User) -> None:
     """Can a user be created?"""
 
     u = add_user
-    assert u.username == "test_user"
+    assert u.username == "new_user"
     assert u.hashed_pwd != "PASSWORD"
     assert u.id != None
     assert User.query.count() == 2
@@ -65,7 +65,7 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
     assert r.text == "A good thing happened"
     assert r.semantic_match == 1.0
     assert r.sentiment_score <= 1.0 and r.sentiment_score > 0
-    assert r.user.username == "seed_user"
+    assert r.user.username == "test_user"
     assert r.headline.text == "A great thing happened"
     assert Rewrite.query.count() == 2
 
@@ -90,7 +90,7 @@ def seed_database() -> None:
     db.drop_all()
     db.create_all()
 
-    user = new_user(username="seed_user", email="seed@seed.com", pwd="PASSWORD")
+    user = new_user(username="test_user", email="seed@seed.com", pwd="PASSWORD")
     source = Source(name="Amazing News", alignment="idealist")
     db.session.add_all([user, source])
     db.session.commit()
@@ -129,7 +129,7 @@ def client() -> FlaskClient:
 def add_user() -> User:
     """Add a user and store in database"""
 
-    user = new_user(username="test_user", email="test@test.com", pwd="PASSWORD")
+    user = new_user(username="new_user", email="test@test.com", pwd="PASSWORD")
     db.session.add(user)
     db.session.commit()
     return user
@@ -162,7 +162,7 @@ def add_headline() -> Headline:
 def add_rewrite() -> Rewrite:
     """Add a rewrite and store in database"""
 
-    user = User.query.filter(User.username == "seed_user").one()
+    user = User.query.filter(User.username == "test_user").one()
     headline = Headline.query.filter(Headline.text == "A great thing happened").one()
 
     rewrite = new_rewrite(
