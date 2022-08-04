@@ -1,12 +1,21 @@
 """News sentiment tracker"""
 
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, jsonify, session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError
 import os
 
-from server.models import db, connect_db, User, Headline, Source, Rewrite
+from server.models import (
+    db,
+    connect_db,
+    User,
+    Headline,
+    Source,
+    Rewrite,
+    new_rewrite,
+    serialize_rewrite,
+)
 
 # from forms import RewriteForm
 
@@ -30,3 +39,35 @@ if os.getenv("FLASK_ENV") == "development":
 
 connect_db(app)
 db.create_all()
+
+
+@app.post("/api/rewrites")
+def submit_rewrite():
+    """Submit headline rewrite"""
+
+    try:
+        current_user = User.query.get(session["user_id"])
+    except:
+        return jsonify(error="You must be logged in.")
+
+    try:
+        text = request.json["text"]
+        headline_id = request.json["headline_id"]
+    except:
+        return jsonify(error="Error")
+
+    try:
+        headline = Headline.query.get(headline_id)
+    except:
+        return jsonify(error="Error")
+
+    rewrite = new_rewrite(text=text, headline=headline, user_id=current_user.id)
+    db.session.add(rewrite)
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify(error="Error saving to database.")
+
+    return (jsonify(rewrite=serialize_rewrite(rewrite)), 201)
