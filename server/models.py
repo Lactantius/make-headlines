@@ -52,7 +52,7 @@ class Headline(db.Model):
 
     text = db.Column(db.String, nullable=False)
 
-    score = db.Column(db.Float, nullable=False)
+    sentiment_score = db.Column(db.Float, nullable=False)
 
     date = db.Column(db.Date, nullable=False)
 
@@ -73,13 +73,18 @@ def new_headline(text: str, date: date, source_id: UUID) -> Headline:
 
     score = calc_sentiment_score("text")
 
-    return Headline(text=text, date=date, source_id=source_id, score=score)
+    return Headline(text=text, date=date, source_id=source_id, sentiment_score=score)
 
 
 def calc_sentiment_score(text: str) -> float:
     """TODO Use Flair to actually calculate this."""
 
     return 1.0
+
+
+##############################################################################
+# Rewrite
+#
 
 
 class Source(db.Model):
@@ -95,12 +100,19 @@ class Source(db.Model):
     alignment = db.Column(db.String)
 
 
+##############################################################################
+# Rewrite
+#
+
+
 class Rewrite(db.Model):
     """User headline rewrite"""
 
     __tablename__ = "rewrites"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    text = db.Column(db.String, nullable=False)
 
     user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"), nullable=False)
 
@@ -114,13 +126,40 @@ class Rewrite(db.Model):
 
     timestamp = db.Column(db.DateTime, default=datetime.now())
 
+    user = db.relationship("User", backref=backref("rewrites", cascade="all, delete"))
+
+    headline = db.relationship(
+        "Headline", backref=backref("rewrites", cascade="all, delete")
+    )
+
+
+def new_rewrite(text: str, headline: Headline, user_id: UUID) -> Rewrite:
+    """Build new rewrite. Does not save to database"""
+
+    sentiment_score = calc_sentiment_score(text)
+    semantic_match = calc_semantic_match(text, headline.text)
+
+    return Rewrite(
+        text=text,
+        sentiment_score=sentiment_score,
+        semantic_match=semantic_match,
+        user_id=user_id,
+        headline_id=headline.id,
+    )
+
+
+def calc_semantic_match(rewrite: str, headline: str) -> float:
+    """TODO Use Gensim"""
+
+    return 1.0
+
 
 ###################################################
 # Functions
 #
 
 
-def new_user(username, email, pwd) -> User:
+def new_user(username: str, email: str, pwd: str) -> User:
     """
     Register user, add attach hashed password, and return user.
     Does not store user in database.
