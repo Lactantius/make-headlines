@@ -48,7 +48,7 @@ def test_new_headline(client: FlaskClient, add_headline: Headline) -> None:
 
     h = add_headline
     assert h.text == "A terrible thing happened"
-    assert h.sentiment_score == 1.0
+    assert h.sentiment_score >= -1.0 and h.sentiment_score < 0
     assert h.source.name == "Amazing News"
     assert Headline.query.count() == 2
 
@@ -64,7 +64,7 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
     r = add_rewrite
     assert r.text == "A good thing happened"
     assert r.semantic_match == 1.0
-    assert r.sentiment_score == 1.0
+    assert r.sentiment_score <= 1.0 and r.sentiment_score > 0
     assert r.user.username == "seed_user"
     assert r.headline.text == "A great thing happened"
     assert Rewrite.query.count() == 2
