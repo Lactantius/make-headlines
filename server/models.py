@@ -5,8 +5,9 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import backref
 import uuid
 from flask_bcrypt import Bcrypt
-
 from datetime import date, datetime
+
+from server.analysis import calc_sentiment_score
 
 bcrypt = Bcrypt()
 db = SQLAlchemy()
@@ -71,15 +72,15 @@ def new_headline(text: str, date: date, source_id: UUID) -> Headline:
     Does not store headline in database
     """
 
-    score = calc_sentiment_score("text")
+    score = calc_sentiment_score(text)
 
     return Headline(text=text, date=date, source_id=source_id, sentiment_score=score)
 
 
-def calc_sentiment_score(text: str) -> float:
-    """TODO Use Flair to actually calculate this."""
+# def calc_sentiment_score(text: str) -> float:
+#     """TODO Use Flair to actually calculate this."""
 
-    return 1.0
+#     return 1.0
 
 
 ##############################################################################
