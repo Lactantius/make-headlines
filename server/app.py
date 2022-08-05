@@ -6,7 +6,6 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import DatabaseError, IntegrityError
 import os
-
 from sqlalchemy.sql import func
 
 from server.models import (
@@ -19,6 +18,8 @@ from server.models import (
     new_rewrite,
     serialize,
 )
+
+from server.forms import RewriteForm
 
 # from forms import RewriteForm
 
@@ -115,4 +116,6 @@ def get_random_headline() -> tuple[Response, int]:
 def index():
     """Get index page"""
 
-    return render_template("index.html")
+    form = RewriteForm()
+
+    return render_template("index.html", form=form)

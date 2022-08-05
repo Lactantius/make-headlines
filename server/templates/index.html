@@ -10,5 +10,23 @@
     <h1>Make Headlines</h1>
 </main>
 
+<div id=rewrite-container>
+
+    <h2 id="original-headline">Loading...</h2>
+
+    <form id="rewrite-form" action="/api/rewrite" method="POST">
+        {{ form.hidden_tag() }}
+
+        {% for field in form if field.widget.input_type != "hidden" %}
+
+        {{ field.label }}
+        {{ field }}
+
+        {% endfor %}
+        <button>Submit</button>
+    </form>
+
+</div>
+
 <script src="/static/app.js"></script>
 {% endblock %}
