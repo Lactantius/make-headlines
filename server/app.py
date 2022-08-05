@@ -3,7 +3,7 @@
 from flask import Flask, redirect, render_template, request, jsonify, session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DatabaseError, IntegrityError
 import os
 
 from server.models import (
@@ -47,19 +47,19 @@ def submit_rewrite():
 
     try:
         current_user = User.query.get(session["user_id"])
-    except:
-        return jsonify(error="You must be logged in.")
+    except KeyError:
+        return (jsonify(error="You must be logged in."), 401)
 
     try:
         text = request.json["text"]
         headline_id = request.json["headline_id"]
-    except:
-        return jsonify(error="Error")
+    except KeyError:
+        return (jsonify(error="Malformed json request."), 400)
 
     try:
         headline = Headline.query.get(headline_id)
-    except:
-        return jsonify(error="Error")
+    except DatabaseError:
+        return (jsonify(error="Headline not found."), 404)
 
     rewrite = new_rewrite(text=text, headline=headline, user_id=current_user.id)
     db.session.add(rewrite)
@@ -68,6 +68,6 @@ def submit_rewrite():
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        return jsonify(error="Error saving to database.")
+        return (jsonify(error="Error saving to database."), 500)
 
     return (jsonify(rewrite=serialize_rewrite(rewrite)), 201)
