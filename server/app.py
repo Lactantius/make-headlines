@@ -17,7 +17,6 @@ from server.models import (
     Source,
     Rewrite,
     new_rewrite,
-    serialize_rewrite,
     serialize,
 )
 
@@ -95,11 +94,25 @@ def submit_rewrite(current_user) -> tuple[Response, int]:
         db.session.rollback()
         return (jsonify(error="Error saving to database."), 500)
 
-    return (jsonify(rewrite=serialize_rewrite(rewrite)), 201)
+    return (jsonify(rewrite=serialize(rewrite)), 201)
 
 
 @app.get("/api/headlines/random")
 def get_random_headline() -> tuple[Response, int]:
+    """Get a random headline"""
 
+    # From https://stackoverflow.com/a/33583008/6632828
     headline = Headline.query.order_by(func.random()).first()
     return (jsonify(headline=serialize(headline)), 200)
+
+
+##############################################################################
+# HTML Routes
+#
+
+
+@app.get("/")
+def index():
+    """Get index page"""
+
+    return render_template("index.html")
