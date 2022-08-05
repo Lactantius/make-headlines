@@ -36,7 +36,13 @@ class User(db.Model):
 
     email = db.Column(db.String(100), nullable=False)
 
-    hashed_pwd = db.Column(db.String, nullable=False)
+    hashed_pwd = db.Column(db.String)
+
+    admin = db.Column(db.Boolean, default=False)
+
+    active = db.Column(db.Boolean, default=True)
+
+    anonymous = db.Column(db.Boolean, default=False)
 
 
 ##############################################################################
@@ -213,3 +219,12 @@ def new_user(username: str, email: str, pwd: str) -> User:
         email=email,
         hashed_pwd=hashed_utf8,
     )
+
+
+def new_anon_user():
+    """
+    Register a user with placeholders for username and email, so that rewrites can be stored in the database.
+    Does not store user in database
+    """
+
+    return User(username=uuid.uuid4(), email=uuid.uuid4(), anonymous=True)

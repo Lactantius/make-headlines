@@ -1,6 +1,7 @@
 """News sentiment tracker"""
 
 from functools import wraps
+from uuid import uuid4
 from flask import Flask, Response, redirect, render_template, request, jsonify, session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
@@ -15,6 +16,7 @@ from server.models import (
     Headline,
     Source,
     Rewrite,
+    new_anon_user,
     new_rewrite,
     serialize,
 )
@@ -49,7 +51,7 @@ db.create_all()
 #
 
 
-def login_required(route):
+def rate_limit(route):
     """Decorator to require a user login before a route"""
 
     @wraps(route)
@@ -57,12 +59,58 @@ def login_required(route):
 
         try:
             current_user = User.query.get(session["user_id"])
-        except KeyError:
-            return (jsonify(error="You must be logged in."), 401)
+        except (KeyError, DatabaseError):
 
-        return route(*args, **kwargs, current_user=current_user)
+            # This allows the system to have a unique user ID for every rewrite in the system, and to
+            # potentially replace the anon user with a real user after login
+            anon_user = new_anon_user()
+            db.session.add(anon_user)
+            db.session.commit()
+
+            session["requests_remaining"] = 2
+            session["user_id"] = anon_user.id
+            return route(*args, **kwargs, current_user=anon_user.id)
+
+        if current_user.anonymous:
+            requests_remaining = session.get("requests_remaining", 0)
+            if requests_remaining > 0:
+                session["requests_remaining"] = requests_remaining - 1
+                return route(*args, **kwargs, current_user=current_user.id)
+            else:
+                return (
+                    jsonify(error="Please login before making additional requests."),
+                    401,
+                )
+
+        else:
+            return route(*args, **kwargs, current_user=current_user.id)
 
     return wrapper
+    # match session.get("requests_remaining", None):
+
+    #     case None:
+    #         session["requests_remaining"] = 9
+    #         return route(*args, **kwargs, current_user=anon_user.id)
+
+    #     case 0:
+    #         return (
+    #             jsonify(
+    #                 error="Please login before making additional requests."
+    #             ),
+    #             401,
+    #         )
+
+    #     case int() as requests_remaining if requests_remaining > 0:
+    #         temp_user = session["user_id"]
+    #         return route(*args, **kwargs, current_user=temp_user)
+
+    #     case _:
+    #         return (
+    #             jsonify(
+    #                 error="Please login before making additional requests."
+    #             ),
+    #             401,
+    #         )
 
 
 ##############################################################################
@@ -71,8 +119,8 @@ def login_required(route):
 
 
 @app.post("/api/rewrites")
-@login_required
-def submit_rewrite(current_user) -> tuple[Response, int]:
+@rate_limit
+def submit_rewrite(current_user: UUID) -> tuple[Response, int]:
     """Submit headline rewrite"""
 
     try:
@@ -86,7 +134,7 @@ def submit_rewrite(current_user) -> tuple[Response, int]:
     except DatabaseError:
         return (jsonify(error="Headline not found."), 404)
 
-    rewrite = new_rewrite(text=text, headline=headline, user_id=current_user.id)
+    rewrite = new_rewrite(text=text, headline=headline, user_id=current_user)
     db.session.add(rewrite)
 
     try:

@@ -56,13 +56,37 @@ def test_unauthenticated_user_handling(client):
 
     headline = Headline.query.filter(Headline.text == "A great thing happened").one()
 
-    no_user = client.post(
+    res = client.post(
         "/api/rewrites",
         json={"text": "Something definitely happened", "headline_id": headline.id},
     )
 
-    assert no_user.status_code == 401
-    assert no_user.json == {"error": "You must be logged in."}
+    assert res.status_code == 201
+    assert res.json["rewrite"]["text"] == "Something definitely happened"
+
+
+def test_rate_limit_unauthenticated_users(client):
+    """Can unauthenticated users submit unlimited rewrites?"""
+
+    headline_id = (
+        Headline.query.filter(Headline.text == "A great thing happened").one().id
+    )
+
+    with client:
+
+        for x in range(4):
+            no_user = client.post(
+                "/api/rewrites",
+                json={
+                    "text": "Something definitely happened",
+                    "headline_id": headline_id,
+                },
+            )
+
+        assert no_user.status_code == 401
+        assert no_user.json == {
+            "error": "Please login before making additional requests."
+        }
 
 
 ##############################################################################
