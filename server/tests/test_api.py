@@ -5,6 +5,10 @@ from server.app import app
 from server.models import Headline, Rewrite, User
 import pytest
 
+##############################################################################
+# Rewrites endpoint
+#
+
 
 def test_submit_rewrite(client, user):
     """Can a user submit a rewrite for a headline?"""
@@ -59,6 +63,21 @@ def test_unauthenticated_user_handling(client):
 
     assert no_user.status_code == 401
     assert no_user.json == {"error": "You must be logged in."}
+
+
+##############################################################################
+# Headlines endpoint
+#
+
+
+def test_get_random_headline(client):
+    """Can a random headline be pulled?"""
+
+    with client:
+        res = client.get("/api/headlines/random")
+
+        assert res.status_code == 200
+        assert res.json["headline"]["text"] != None
 
 
 @pytest.fixture
