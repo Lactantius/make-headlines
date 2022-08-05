@@ -12,6 +12,15 @@ const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
 const rewriteFormText = rewriteForm.querySelector("input") as HTMLInputElement;
 
 /*
+ * Event Listeners
+ */
+
+rewriteForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  rewriteFormHandler();
+});
+
+/*
  * Main Form Functions
  */
 
