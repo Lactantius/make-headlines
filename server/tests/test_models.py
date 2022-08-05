@@ -110,17 +110,6 @@ def seed_database() -> None:
 
 @pytest.fixture
 def client() -> FlaskClient:
-    # os.environ["DATABASE_URL"] = "postgresql:///warbler_test"
-
-    # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///headlines_test"
-
-    # app.config["TESTING"] = True
-    # app.config["DEBUG_TB_HOSTS"] = ["dont-show-debug-toolbar"]
-    # app.config["WTF_CSRF_ENABLED"] = False
-
-    # Create our tables (we do this here, so we only create the tables
-    # once for all tests --- in each test, we'll delete the data
-    # and create fresh new clean test data
 
     return app.test_client()
 
