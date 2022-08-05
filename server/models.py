@@ -149,30 +149,43 @@ def new_rewrite(text: str, headline: Headline, user_id: UUID) -> Rewrite:
     )
 
 
-def serialize_rewrite(rewrite: Rewrite) -> dict[str, (str | float)]:
-    """Return serialized rewrite"""
+# def serialize_rewrite(rewrite: Rewrite) -> dict[str, (str | float)]:
+#     """Return serialized rewrite"""
 
-    return {
-        "id": rewrite.id,
-        "text": rewrite.text,
-        "sentiment_score": rewrite.sentiment_score,
-        "semantic_match": rewrite.semantic_match,
-        "user_id": rewrite.user_id,
-        "headline_id": rewrite.headline_id,
-        "timestamp": rewrite.timestamp,
-    }
+#     return {
+#         "id": obj.id,
+#         "text": obj.text,
+#         "sentiment_score": obj.sentiment_score,
+#         "semantic_match": obj.semantic_match,
+#         "user_id": obj.user_id,
+#         "headline_id": obj.headline_id,
+#         "timestamp": obj.timestamp,
+#     }
 
 
-def serialize(headline: Headline) -> dict[str, (str | float)]:
+def serialize(obj: (Headline | Rewrite)) -> dict[str, (str | float)]:
     """Return serialized headline"""
 
-    return {
-        "id": headline.id,
-        "text": headline.text,
-        "sentiment_score": headline.sentiment_score,
-        "date": headline.date,
-        "source_id": headline.source_id,
-    }
+    match obj:
+        case Headline():
+            return {
+                "id": obj.id,
+                "text": obj.text,
+                "sentiment_score": obj.sentiment_score,
+                "date": obj.date,
+                "source_id": obj.source_id,
+            }
+
+        case Rewrite:
+            return {
+                "id": obj.id,
+                "text": obj.text,
+                "sentiment_score": obj.sentiment_score,
+                "semantic_match": obj.semantic_match,
+                "user_id": obj.user_id,
+                "headline_id": obj.headline_id,
+                "timestamp": obj.timestamp,
+            }
 
 
 def calc_semantic_match(rewrite: str, headline: str) -> float:
