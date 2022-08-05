@@ -163,6 +163,18 @@ def serialize_rewrite(rewrite: Rewrite) -> dict[str, (str | float)]:
     }
 
 
+def serialize(headline: Headline) -> dict[str, (str | float)]:
+    """Return serialized headline"""
+
+    return {
+        "id": headline.id,
+        "text": headline.text,
+        "sentiment_score": headline.sentiment_score,
+        "date": headline.date,
+        "source_id": headline.source_id,
+    }
+
+
 def calc_semantic_match(rewrite: str, headline: str) -> float:
     """TODO Use Gensim"""
 

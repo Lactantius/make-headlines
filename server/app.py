@@ -7,6 +7,8 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import DatabaseError, IntegrityError
 import os
 
+from sqlalchemy.sql import func
+
 from server.models import (
     db,
     connect_db,
@@ -16,6 +18,7 @@ from server.models import (
     Rewrite,
     new_rewrite,
     serialize_rewrite,
+    serialize,
 )
 
 # from forms import RewriteForm
@@ -97,4 +100,6 @@ def submit_rewrite(current_user) -> tuple[Response, int]:
 
 @app.get("/api/headlines/random")
 def get_random_headline() -> tuple[Response, int]:
-    return (jsonify(), 200)
+
+    headline = Headline.query.order_by(func.random()).first()
+    return (jsonify(headline=serialize(headline)), 200)
