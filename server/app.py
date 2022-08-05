@@ -1,6 +1,7 @@
 """News sentiment tracker"""
 
-from flask import Flask, redirect, render_template, request, jsonify, session
+from functools import wraps
+from flask import Flask, Response, redirect, render_template, request, jsonify, session
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import DatabaseError, IntegrityError
@@ -40,15 +41,36 @@ if os.getenv("FLASK_ENV") == "development":
 connect_db(app)
 db.create_all()
 
+##############################################################################
+# Decorators
+#
+
+
+def login_required(route):
+    """Decorator to require a user login before a route"""
+
+    @wraps(route)
+    def wrapper(*args, **kwargs):
+
+        try:
+            current_user = User.query.get(session["user_id"])
+        except KeyError:
+            return (jsonify(error="You must be logged in."), 401)
+
+        return route(*args, **kwargs, current_user=current_user)
+
+    return wrapper
+
+
+##############################################################################
+# JSON API
+#
+
 
 @app.post("/api/rewrites")
-def submit_rewrite():
+@login_required
+def submit_rewrite(current_user) -> tuple[Response, int]:
     """Submit headline rewrite"""
-
-    try:
-        current_user = User.query.get(session["user_id"])
-    except KeyError:
-        return (jsonify(error="You must be logged in."), 401)
 
     try:
         text = request.json["text"]
@@ -71,3 +93,8 @@ def submit_rewrite():
         return (jsonify(error="Error saving to database."), 500)
 
     return (jsonify(rewrite=serialize_rewrite(rewrite)), 201)
+
+
+@app.get("/api/headlines/random")
+def get_random_headline() -> tuple[Response, int]:
+    return (jsonify(), 200)
