@@ -4,16 +4,41 @@
  */
 const headlineElement = document.querySelector("#original-headline");
 const rewriteForm = document.querySelector("#rewrite-form");
-const rewriteFormText = rewriteForm.querySelector("input");
+const rewriteFormInput = rewriteForm.querySelector("#text");
+const rewriteDisplay = document.querySelector("#rewrite-display");
+/*
+ * Event Listeners
+ */
+rewriteForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    rewriteFormHandler();
+});
 function rewriteFormHandler() {
     const requestBody = {
-        text: rewriteFormText.value,
+        text: rewriteFormInput.value,
         headline_id: headlineElement.dataset.id,
     };
-    return sendRewrite(requestBody);
+    const rewrite = sendRewrite(requestBody);
+    console.log("handler: ", rewrite);
+    showRewrite(rewrite);
+}
+function showRewrite(rewrite) {
+    console.log("show: ", rewrite);
+    rewrite.then((r) => (rewriteDisplay.innerText = `${r.rewrite.text} | Score: ${calculateScore(r.rewrite.semantic_match)}`));
+}
+function calculateScore(match) {
+    return Math.round(Math.abs(match) * 100);
 }
 function sendRewrite(data) {
-    return fetch("/api/rewrites", { method: "POST", body: JSON.stringify(data) });
+    console.log(data);
+    return fetch("/api/rewrites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    })
+        .then((p) => p.json())
+        .then((data) => data)
+        .catch((err) => err);
 }
 /*
  * Replace headlines

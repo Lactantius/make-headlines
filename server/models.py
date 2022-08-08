@@ -129,6 +129,8 @@ class Rewrite(db.Model):
 
     sentiment_score = db.Column(db.Float, nullable=False)
 
+    sentiment_match = db.Column(db.Float, nullable=False)
+
     semantic_match = db.Column(db.Float, nullable=False)
 
     timestamp = db.Column(db.DateTime, default=datetime.now())
@@ -144,11 +146,13 @@ def new_rewrite(text: str, headline: Headline, user_id: UUID) -> Rewrite:
     """Build new rewrite. Does not save to database"""
 
     sentiment_score = calc_sentiment_score(text)
+    sentiment_match = sentiment_score - headline.sentiment_score
     semantic_match = calc_semantic_match(text, headline.text)
 
     return Rewrite(
         text=text,
         sentiment_score=sentiment_score,
+        sentiment_match=sentiment_match,
         semantic_match=semantic_match,
         user_id=user_id,
         headline_id=headline.id,
@@ -187,6 +191,7 @@ def serialize(obj: (Headline | Rewrite)) -> dict[str, (str | float)]:
                 "id": obj.id,
                 "text": obj.text,
                 "sentiment_score": obj.sentiment_score,
+                "sentiment_match": obj.sentiment_match,
                 "semantic_match": obj.semantic_match,
                 "user_id": obj.user_id,
                 "headline_id": obj.headline_id,
