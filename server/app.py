@@ -124,6 +124,20 @@ def rate_limit(route):
     #         )
 
 
+def get_user(route):
+    """Get user from session and pass to route"""
+
+    def wrapper(*args, **kwargs):
+        try:
+            user = User.query.get(session["user_id"])
+        except (KeyError, DatabaseError):
+            return route(*args, **kwargs, current_user=None)
+
+        return route(*args, **kwargs, current_user=user)
+
+    return wrapper
+
+
 ##############################################################################
 # JSON API
 #
@@ -172,12 +186,13 @@ def get_random_headline() -> tuple[Response, int]:
 
 
 @app.get("/")
-def index():
+@get_user
+def index(current_user=None):
     """Get index page"""
 
     form = RewriteForm()
 
-    return render_template("index.html", form=form)
+    return render_template("index.html", form=form, user=current_user)
 
 
 @app.route("/signup", methods=["GET", "POST"])
