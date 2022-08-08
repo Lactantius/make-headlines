@@ -11,7 +11,7 @@ const headlineElement = document.querySelector(
 const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
 const rewriteFormInput = rewriteForm.querySelector("#text") as HTMLInputElement;
 const rewriteDisplay = document.querySelector(
-  "#rewrite-display"
+  "#rewrite-list"
 ) as HTMLParagraphElement;
 
 /*
@@ -49,18 +49,22 @@ interface Rewrite {
     text: string;
     timestamp: string;
     semantic_score: number;
+    sentiment_match: number;
     semantic_match: number;
     sentiment_score: number;
   };
 }
 
 function showRewrite(rewrite: Promise<Rewrite>): void {
+  const li = document.createElement("li");
+
   rewrite.then(
     (r) =>
-    (rewriteDisplay.innerText = `${r.rewrite.text} | Score: ${calculateScore(
-      r.rewrite.semantic_match
+    (li.innerText = `${r.rewrite.text} | Score: ${calculateScore(
+      r.rewrite.sentiment_match
     )}`)
   );
+  rewriteDisplay.prepend(li);
 }
 
 function calculateScore(match: number): number {

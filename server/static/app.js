@@ -5,7 +5,7 @@
 const headlineElement = document.querySelector("#original-headline");
 const rewriteForm = document.querySelector("#rewrite-form");
 const rewriteFormInput = rewriteForm.querySelector("#text");
-const rewriteDisplay = document.querySelector("#rewrite-display");
+const rewriteDisplay = document.querySelector("#rewrite-list");
 /*
  * Event Listeners
  */
@@ -19,12 +19,12 @@ function rewriteFormHandler() {
         headline_id: headlineElement.dataset.id,
     };
     const rewrite = sendRewrite(requestBody);
-    console.log("handler: ", rewrite);
     showRewrite(rewrite);
 }
 function showRewrite(rewrite) {
-    console.log("show: ", rewrite);
-    rewrite.then((r) => (rewriteDisplay.innerText = `${r.rewrite.text} | Score: ${calculateScore(r.rewrite.semantic_match)}`));
+    const li = document.createElement("li");
+    rewrite.then((r) => (li.innerText = `${r.rewrite.text} | Score: ${calculateScore(r.rewrite.sentiment_match)}`));
+    rewriteDisplay.prepend(li);
 }
 function calculateScore(match) {
     return Math.round(Math.abs(match) * 100);
