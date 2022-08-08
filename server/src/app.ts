@@ -37,8 +37,7 @@ function rewriteFormHandler() {
     text: rewriteFormInput.value,
     headline_id: headlineElement.dataset.id as string,
   };
-  const rewrite = sendRewrite(requestBody);
-  console.log("handler: ", rewrite);
+  const rewrite: Promise<Rewrite> = sendRewrite(requestBody);
   showRewrite(rewrite);
 }
 
@@ -56,7 +55,6 @@ interface Rewrite {
 }
 
 function showRewrite(rewrite: Promise<Rewrite>): void {
-  console.log("show: ", rewrite);
   rewrite.then(
     (r) =>
     (rewriteDisplay.innerText = `${r.rewrite.text} | Score: ${calculateScore(

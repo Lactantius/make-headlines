@@ -17,8 +17,10 @@ from server.models import (
     new_rewrite,
     new_user,
     new_headline,
+    authenticate_user,
 )
 from server.app import app
+from fixtures import set_config_variables, seed_database
 
 ##############################################################################
 # User model tests
@@ -36,6 +38,19 @@ def test_new_user(client: FlaskClient, add_user: User) -> None:
 
     etiam = new_user(username="test2", email="email@email.com", pwd="something")
     assert etiam.hashed_pwd != "something"
+
+
+def test_authenticate_user(client: FlaskClient) -> None:
+    """Can a user be authenticated?"""
+
+    user = authenticate_user("test_user", "PASSWORD")
+    assert user.username == "test_user"
+
+    bad_password = authenticate_user("test_user", "BAD_PASSWORD")
+    assert bad_password == None
+
+    no_user = authenticate_user("bad_username", "PASSWORD")
+    assert no_user == None
 
 
 ##############################################################################
@@ -73,39 +88,6 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
 ##############################################################################
 # Fixtures
 #
-
-
-@pytest.fixture(scope="session", autouse=True)
-def set_config_variables() -> None:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///headlines_test"
-
-    app.config["TESTING"] = True
-    app.config["DEBUG_TB_HOSTS"] = ["dont-show-debug-toolbar"]
-    app.config["WTF_CSRF_ENABLED"] = False
-
-
-@pytest.fixture(scope="session", autouse=True)
-def seed_database() -> None:
-
-    db.drop_all()
-    db.create_all()
-
-    user = new_user(username="test_user", email="seed@seed.com", pwd="PASSWORD")
-    source = Source(name="Amazing News", alignment="idealist")
-    db.session.add_all([user, source])
-    db.session.commit()
-
-    headline = new_headline(
-        text="A great thing happened", date=date.today(), source_id=source.id
-    )
-    db.session.add(headline)
-    db.session.commit()
-
-    rewrite = new_rewrite(
-        text="An ok thing happened", headline=headline, user_id=user.id
-    )
-    db.session.add(rewrite)
-    db.session.commit()
 
 
 @pytest.fixture

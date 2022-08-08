@@ -2,7 +2,16 @@
 
 from functools import wraps
 from uuid import uuid4
-from flask import Flask, Response, redirect, render_template, request, jsonify, session
+from flask import (
+    Flask,
+    Response,
+    flash,
+    redirect,
+    render_template,
+    request,
+    jsonify,
+    session,
+)
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import DatabaseError, IntegrityError
@@ -10,6 +19,7 @@ import os
 from sqlalchemy.sql import func
 
 from server.models import (
+    authenticate_user,
     db,
     connect_db,
     User,
@@ -18,10 +28,11 @@ from server.models import (
     Rewrite,
     new_anon_user,
     new_rewrite,
+    new_user,
     serialize,
 )
 
-from server.forms import RewriteForm
+from server.forms import RewriteForm, SignupForm, LoginForm
 
 # from forms import RewriteForm
 
@@ -167,3 +178,56 @@ def index():
     form = RewriteForm()
 
     return render_template("index.html", form=form)
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup_page():
+    """Sign up user"""
+
+    form = SignupForm()
+    if form.validate_on_submit():
+
+        user = new_user(
+            username=form.username.data, email=form.email.data, pwd=form.password.data
+        )
+        db.session.add(user)
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            flash("Invalid username or password.", "danger")
+            return redirect("/signup")
+
+        session["user_id"] = user.id
+        flash("Thanks for signing up.", "success")
+        return redirect("/")
+
+    return render_template("signup.html", form=form)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login_page():
+    """Login user"""
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = authenticate_user(form.username.data, form.password.data)
+
+        if user:
+            session["user_id"] = user.id
+            flash(f"Welcome back, {user.username}.", "success")
+            return redirect("/")
+
+        else:
+            flash("Invalid username or password.", "danger")
+            return redirect("/login")
+
+    return render_template("login.html", form=form)
+
+
+@app.post("/logout")
+def logout():
+    """Logout user and redirect to index"""
+    del session["user_id"]
+    flash("Logged out successfully", "success")
+    return redirect("/")

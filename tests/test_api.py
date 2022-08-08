@@ -5,6 +5,8 @@ from server.app import app
 from server.models import Headline, Rewrite, User
 import pytest
 
+from fixtures import seed_database, set_config_variables
+
 ##############################################################################
 # Rewrites endpoint
 #
