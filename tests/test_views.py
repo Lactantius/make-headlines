@@ -1,6 +1,6 @@
 """Test Views"""
 
-from flask import request
+from flask import request, session
 from flask.testing import FlaskClient
 from server.app import app
 from server.models import Headline, Rewrite, User
@@ -66,6 +66,17 @@ def test_signup(client: FlaskClient) -> None:
         )
         assert res.status_code == 200
         assert b"Thanks for signing up" in res.data
+
+
+def test_logout(client: FlaskClient) -> None:
+    """Can a user logout?"""
+
+    with client:
+        res = client.post("/logout", follow_redirects=True)
+
+        assert res.status_code == 200
+        assert b"Logged out successfully" in res.data
+        assert session["user_id"] == None
 
 
 @pytest.fixture

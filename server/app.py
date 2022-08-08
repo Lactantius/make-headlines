@@ -228,6 +228,6 @@ def login_page():
 @app.post("/logout")
 def logout():
     """Logout user and redirect to index"""
-    del session["user_id"]
+    session["user_id"] = None
     flash("Logged out successfully", "success")
     return redirect("/")
