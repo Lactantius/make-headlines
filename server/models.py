@@ -2,6 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import backref
 import uuid
 from flask_bcrypt import Bcrypt
@@ -43,6 +44,22 @@ class User(db.Model):
     active = db.Column(db.Boolean, default=True)
 
     anonymous = db.Column(db.Boolean, default=False)
+
+
+def authenticate_user(username: str, password: str) -> User | None:
+    """Get a user from the database given a username/email and password"""
+
+    try:
+        user = User.query.filter(
+            (User.email == username) | (User.username == username)
+        ).one()
+    except NoResultFound:
+        return None
+
+    if bcrypt.check_password_hash(user.hashed_pwd, password):
+        return user
+    else:
+        return None
 
 
 ##############################################################################
