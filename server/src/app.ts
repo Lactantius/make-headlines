@@ -9,7 +9,10 @@ const headlineElement = document.querySelector(
 ) as HTMLHeadingElement;
 
 const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
-const rewriteFormText = rewriteForm.querySelector("input") as HTMLInputElement;
+const rewriteFormInput = rewriteForm.querySelector("#text") as HTMLInputElement;
+const rewriteDisplay = document.querySelector(
+  "#rewrite-display"
+) as HTMLParagraphElement;
 
 /*
  * Event Listeners
@@ -31,14 +34,51 @@ interface RewriteRequest {
 
 function rewriteFormHandler() {
   const requestBody: RewriteRequest = {
-    text: rewriteFormText.value,
+    text: rewriteFormInput.value,
     headline_id: headlineElement.dataset.id as string,
   };
-  return sendRewrite(requestBody);
+  const rewrite = sendRewrite(requestBody);
+  console.log("handler: ", rewrite);
+  showRewrite(rewrite);
+}
+
+interface Rewrite {
+  rewrite: {
+    id: string;
+    headline_id: string;
+    user_id: string;
+    text: string;
+    timestamp: string;
+    semantic_score: number;
+    semantic_match: number;
+    sentiment_score: number;
+  };
+}
+
+function showRewrite(rewrite: Promise<Rewrite>): void {
+  console.log("show: ", rewrite);
+  rewrite.then(
+    (r) =>
+    (rewriteDisplay.innerText = `${r.rewrite.text} | Score: ${calculateScore(
+      r.rewrite.semantic_match
+    )}`)
+  );
+}
+
+function calculateScore(match: number): number {
+  return Math.round(Math.abs(match) * 100);
 }
 
 function sendRewrite(data: RewriteRequest) {
-  return fetch("/api/rewrites", { method: "POST", body: JSON.stringify(data) });
+  console.log(data);
+  return fetch("/api/rewrites", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+    .then((p) => p.json())
+    .then((data) => data)
+    .catch((err) => err);
 }
 
 /*
