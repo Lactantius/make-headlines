@@ -155,18 +155,18 @@ def get_random_headline() -> tuple[Response, int]:
     return (jsonify(headline=serialize(headline)), 200)
 
 
-@app.get("/api/users/<user_id>/rewrites")
-@get_user
-def get_all_rewrites(user_id, user):
-    """Get all rewrites by a user"""
-    if user_id == user.id or user.admin:
-        rewrites = Rewrite.query.filter(Rewrite.user == user).order_by(Headline.date)
-        return jsonify()
-    else:
-        return (
-            jsonify(error="You must log in to view this information."),
-            401,
-        )
+# @app.get("/api/users/<user_id>/rewrites")
+# @get_user
+# def get_all_rewrites(user_id, user):
+#     """Get all rewrites by a user"""
+#     if user_id == user.id or user.admin:
+#         rewrites = Rewrite.query.filter(Rewrite.user == user).order_by(Headline.date)
+#         return jsonify()
+#     else:
+#         return (
+#             jsonify(error="You must log in to view this information."),
+#             401,
+#         )
 
 
 ##############################################################################
