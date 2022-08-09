@@ -5,3 +5,12 @@ Rewrite headlines from news organizations to change the positive/negative sentim
 ** TODO
 
 - [ ] Flair pulls in dozens of dependencies, most of the unnecessary. Remove them from production.
+- [ ] Calculate semantic match
+- [ ] Test frontend
+- [ ] Let user see all rewrites
+- [ ] Password reset
+- [ ] User validations
+- [ ] More news sources
+- [ ] About page
+- [ ] Default main page to only showing today's headlines
+- [ ] Handle failed request to /api/rewrites gracefully on the frontend
