@@ -3,6 +3,7 @@
 {% block title %}Signup{% endblock %}
 
 {% block content %}
+{% include 'nav.html' %}
 <h1>Sign up</h1>
 <form id="signup-form" action="/signup" method="POST" class="user-form">
     {{ form.hidden_tag() }}
