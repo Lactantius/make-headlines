@@ -3,15 +3,22 @@
  * Get DOM elements
  */
 const headlineElement = document.querySelector("#original-headline");
+const rewriteContainer = document.querySelector("#rewrite-container");
 const rewriteForm = document.querySelector("#rewrite-form");
 const rewriteFormInput = rewriteForm.querySelector("#text");
 const rewriteDisplay = document.querySelector("#rewrite-list");
+const switchHeadlineForm = document.querySelector("#switch-headline");
+const oldRewrites = document.querySelector("#old-rewrites");
 /*
  * Event Listeners
  */
 rewriteForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
     rewriteFormHandler();
+});
+switchHeadlineForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    replaceHeadline();
 });
 function rewriteFormHandler() {
     const requestBody = {
@@ -54,6 +61,14 @@ function getHeadline() {
         .then((res) => res.json())
         .then((data) => data.headline)
         .catch((err) => err);
+}
+function moveHeadline() {
+    if (rewriteDisplay.children.length === 0) {
+        return;
+    }
+    const oldHeadlineContainer = rewriteContainer.cloneNode(true);
+    oldHeadlineContainer.setAttribute("id", "");
+    oldRewrites.prepend(oldHeadlineContainer);
 }
 // .then(res => res.json().then(json => json.text))
 /*

@@ -8,6 +8,9 @@ const headlineElement = document.querySelector(
   "#original-headline"
 ) as HTMLHeadingElement;
 
+const rewriteContainer = document.querySelector(
+  "#rewrite-container"
+) as HTMLDivElement;
 const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
 const rewriteFormInput = rewriteForm.querySelector("#text") as HTMLInputElement;
 const rewriteDisplay = document.querySelector(
@@ -17,6 +20,8 @@ const rewriteDisplay = document.querySelector(
 const switchHeadlineForm = document.querySelector(
   "#switch-headline"
 ) as HTMLFormElement;
+
+const oldRewrites = document.querySelector("#old-rewrites") as HTMLDivElement;
 
 /*
  * Event Listeners
@@ -31,6 +36,7 @@ switchHeadlineForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
   replaceHeadline();
 });
+
 /*
  * Main Form Functions
  */
@@ -107,6 +113,17 @@ function getHeadline() {
     .then((res) => res.json())
     .then((data) => data.headline)
     .catch((err) => err);
+}
+
+function moveHeadline() {
+  if (rewriteDisplay.children.length === 0) {
+    return;
+  }
+  const oldHeadlineContainer = rewriteContainer.cloneNode(
+    true
+  ) as HTMLDivElement;
+  oldHeadlineContainer.setAttribute("id", "");
+  oldRewrites.prepend(oldHeadlineContainer);
 }
 
 // .then(res => res.json().then(json => json.text))

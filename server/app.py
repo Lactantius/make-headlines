@@ -243,6 +243,10 @@ def login_page():
 @app.post("/logout")
 def logout():
     """Logout user and redirect to index"""
-    session["user_id"] = None
+    try:
+        session.pop("user_id")
+    except KeyError:
+        return redirect("/")
+
     flash("Logged out successfully", "success")
     return redirect("/")

@@ -68,7 +68,7 @@ def test_signup(client: FlaskClient) -> None:
         assert b"Thanks for signing up" in res.data
 
 
-def test_logout(client: FlaskClient) -> None:
+def test_logout(client: FlaskClient, user: User) -> None:
     """Can a user logout?"""
 
     with client:
@@ -76,7 +76,7 @@ def test_logout(client: FlaskClient) -> None:
 
         assert res.status_code == 200
         assert b"Logged out successfully" in res.data
-        assert session["user_id"] == None
+        assert "user_id" not in session
 
 
 @pytest.fixture
