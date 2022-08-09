@@ -13,9 +13,9 @@ const rewriteContainer = document.querySelector(
 ) as HTMLDivElement;
 const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
 const rewriteFormInput = rewriteForm.querySelector("#text") as HTMLInputElement;
-const rewriteDisplay = document.querySelector(
+const mainRewriteDisplay = document.querySelector(
   "#rewrite-list"
-) as HTMLParagraphElement;
+) as HTMLUListElement;
 
 const switchHeadlineForm = document.querySelector(
   "#switch-headline"
@@ -29,11 +29,17 @@ const oldRewrites = document.querySelector("#old-rewrites") as HTMLDivElement;
 
 rewriteForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
-  rewriteFormHandler();
+  rewriteFormHandler(
+    mainRewriteDisplay,
+    rewriteFormInput.value,
+    headlineElement.dataset.id as string
+  );
+  rewriteForm.reset();
 });
 
 switchHeadlineForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
+  moveHeadline();
   replaceHeadline();
 });
 
@@ -46,13 +52,17 @@ interface RewriteRequest {
   headline_id: string;
 }
 
-function rewriteFormHandler() {
+function rewriteFormHandler(
+  rewriteList: HTMLUListElement,
+  text: string,
+  headlineId: string
+) {
   const requestBody: RewriteRequest = {
-    text: rewriteFormInput.value,
-    headline_id: headlineElement.dataset.id as string,
+    text: text,
+    headline_id: headlineId,
   };
   const rewrite: Promise<Rewrite> = sendRewrite(requestBody);
-  showRewrite(rewrite);
+  showRewrite(rewrite, rewriteList);
 }
 
 interface Rewrite {
@@ -69,7 +79,10 @@ interface Rewrite {
   };
 }
 
-function showRewrite(rewrite: Promise<Rewrite>): void {
+function showRewrite(
+  rewrite: Promise<Rewrite>,
+  rewriteList: HTMLUListElement
+): void {
   const li = document.createElement("li");
 
   rewrite.then(
@@ -78,7 +91,7 @@ function showRewrite(rewrite: Promise<Rewrite>): void {
       r.rewrite.sentiment_match
     )}`)
   );
-  rewriteDisplay.prepend(li);
+  rewriteList.prepend(li);
 }
 
 function calculateScore(match: number): number {
@@ -116,19 +129,41 @@ function getHeadline() {
 }
 
 function moveHeadline() {
-  if (rewriteDisplay.children.length === 0) {
+  if (mainRewriteDisplay.children.length === 0) {
     return;
   }
-  const oldHeadlineContainer = rewriteContainer.cloneNode(
-    true
-  ) as HTMLDivElement;
-  oldHeadlineContainer.setAttribute("id", "");
-  oldRewrites.prepend(oldHeadlineContainer);
+  const oldHeadline = rewriteContainer.cloneNode(true) as HTMLDivElement;
+  mainRewriteDisplay.replaceChildren("");
+  /* Remove button to switch the headline */
+  (oldHeadline.querySelector("#switch-headline") as HTMLFormElement).remove();
+
+  removeIds(oldHeadline);
+
+  const ul = oldHeadline.querySelector("ul") as HTMLUListElement;
+  const input = oldHeadline.querySelector(
+    "input[type=text]"
+  ) as HTMLInputElement;
+  const headline = oldHeadline.querySelector("h2") as HTMLHeadingElement;
+  const form = oldHeadline.querySelector("form") as HTMLFormElement;
+
+  form.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    rewriteFormHandler(ul, input.value, headline.dataset.id as string);
+    form.reset();
+  });
+  oldRewrites.prepend(oldHeadline);
 }
 
-// .then(res => res.json().then(json => json.text))
+function removeIds(node: Element): void {
+  node.removeAttribute("id");
+  const children = node.querySelectorAll("*");
+  for (let child of children) {
+    child.removeAttribute("id");
+  }
+}
 
 /*
  * Initialize
  */
+
 replaceHeadline();
