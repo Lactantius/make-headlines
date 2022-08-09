@@ -97,31 +97,6 @@ def rate_limit(route):
             return route(*args, **kwargs, current_user=current_user.id)
 
     return wrapper
-    # match session.get("requests_remaining", None):
-
-    #     case None:
-    #         session["requests_remaining"] = 9
-    #         return route(*args, **kwargs, current_user=anon_user.id)
-
-    #     case 0:
-    #         return (
-    #             jsonify(
-    #                 error="Please login before making additional requests."
-    #             ),
-    #             401,
-    #         )
-
-    #     case int() as requests_remaining if requests_remaining > 0:
-    #         temp_user = session["user_id"]
-    #         return route(*args, **kwargs, current_user=temp_user)
-
-    #     case _:
-    #         return (
-    #             jsonify(
-    #                 error="Please login before making additional requests."
-    #             ),
-    #             401,
-    #         )
 
 
 def get_user(route):
@@ -178,6 +153,20 @@ def get_random_headline() -> tuple[Response, int]:
     # From https://stackoverflow.com/a/33583008/6632828
     headline = Headline.query.order_by(func.random()).first()
     return (jsonify(headline=serialize(headline)), 200)
+
+
+@app.get("/api/users/<user_id>/rewrites")
+@get_user
+def get_all_rewrites(user_id, user):
+    """Get all rewrites by a user"""
+    if user_id == user.id or user.admin:
+        rewrites = Rewrite.query.filter(Rewrite.user == user).order_by(Headline.date)
+        return jsonify()
+    else:
+        return (
+            jsonify(error="You must log in to view this information."),
+            401,
+        )
 
 
 ##############################################################################
