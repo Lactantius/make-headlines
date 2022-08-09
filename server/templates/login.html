@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Log in</h1>
-<form id="login-form" action="/login" method="POST">
+<form id="login-form" action="/login" method="POST" class="user-form">
     {{ form.hidden_tag() }}
 
     {% for field in form if field.widget.input_type != "hidden" %}
@@ -15,5 +15,5 @@
     {% endfor %}
     <button>Log in</button>
 </form>
-<a href="/signup">Sign up now</a>
+<p>No account? <a href="/signup">Sign up now.</a></p>
 {% endblock %}

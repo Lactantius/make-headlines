@@ -118,6 +118,10 @@ function replaceHeadline() {
   getHeadline().then((headline) => {
     headlineElement.innerText = headline.text;
     headlineElement.dataset.id = headline.id;
+    (headlineElement.parentElement as HTMLAnchorElement).setAttribute(
+      "href",
+      headline.url
+    );
   });
 }
 

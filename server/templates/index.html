@@ -8,31 +8,34 @@
 
 <main>
     <h1>Make Headlines</h1>
+    <p>Change the emotions of real headlines. <a href="/about">Learn more</a>.</p>
+
+    <div id=main-rewrite-container class="rewrite-container">
+
+        <a>
+            <h2 id="original-headline">Loading...</h2>
+        </a>
+
+        <form id="rewrite-form" action="/api/rewrite" method="POST">
+            {{ form.hidden_tag() }}
+
+            {% for field in form if field.widget.input_type != "hidden" %}
+
+            {{ field.label }}
+            {{ field }}
+
+            {% endfor %}
+            <button>Submit</button>
+        </form>
+        <form id="switch-headline"><button>New headline</button></form>
+
+        <ul id="rewrite-list"></ul>
+    </div>
+
+    <h2>Previous Headlines</h2>
+    <div id=old-rewrites>
+    </div>
+
+    <script src="/static/app.js"></script>
 </main>
-
-<div id=main-rewrite-container class="rewrite-container">
-
-    <h2 id="original-headline">Loading...</h2>
-
-    <form id="rewrite-form" action="/api/rewrite" method="POST">
-        {{ form.hidden_tag() }}
-
-        {% for field in form if field.widget.input_type != "hidden" %}
-
-        {{ field.label }}
-        {{ field }}
-
-        {% endfor %}
-        <button>Submit</button>
-    </form>
-    <form id="switch-headline"><button>New headline</button></form>
-
-    <ul id="rewrite-list"></ul>
-</div>
-
-<h2>Previous Headlines</h2>
-<div id=old-rewrites>
-</div>
-
-<script src="/static/app.js"></script>
 {% endblock %}

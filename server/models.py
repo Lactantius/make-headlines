@@ -207,9 +207,10 @@ def serialize(obj: (Headline | Rewrite)) -> dict[str, (str | float)]:
                 "sentiment_score": obj.sentiment_score,
                 "date": obj.date,
                 "source_id": obj.source_id,
+                "url": obj.url,
             }
 
-        case Rewrite:
+        case Rewrite():
             return {
                 "id": obj.id,
                 "text": obj.text,
