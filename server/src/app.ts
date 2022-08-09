@@ -9,7 +9,7 @@ const headlineElement = document.querySelector(
 ) as HTMLHeadingElement;
 
 const rewriteContainer = document.querySelector(
-  "#rewrite-container"
+  "#main-rewrite-container"
 ) as HTMLDivElement;
 const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
 const rewriteFormInput = rewriteForm.querySelector("#text") as HTMLInputElement;

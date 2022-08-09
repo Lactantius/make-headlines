@@ -10,10 +10,9 @@
     <h1>Make Headlines</h1>
 </main>
 
-<div id=rewrite-container>
+<div id=main-rewrite-container class="rewrite-container">
 
     <h2 id="original-headline">Loading...</h2>
-    <form id="switch-headline"><button>Want a different headline?</button></form>
 
     <form id="rewrite-form" action="/api/rewrite" method="POST">
         {{ form.hidden_tag() }}
@@ -26,11 +25,14 @@
         {% endfor %}
         <button>Submit</button>
     </form>
+    <form id="switch-headline"><button>New headline</button></form>
 
     <ul id="rewrite-list"></ul>
 </div>
 
-<div id=old-rewrites></div>
+<h2>Previous Headlines</h2>
+<div id=old-rewrites>
+</div>
 
 <script src="/static/app.js"></script>
 {% endblock %}
