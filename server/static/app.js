@@ -3,7 +3,7 @@
  * Get DOM elements
  */
 const headlineElement = document.querySelector("#original-headline");
-const rewriteContainer = document.querySelector("#rewrite-container");
+const rewriteContainer = document.querySelector("#main-rewrite-container");
 const rewriteForm = document.querySelector("#rewrite-form");
 const rewriteFormInput = rewriteForm.querySelector("#text");
 const mainRewriteDisplay = document.querySelector("#rewrite-list");

@@ -1,7 +1,51 @@
 :root {
   font-size: 62.5%; }
 
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 1.5rem; }
+
+h1,
+h2 {
+  text-align: center; }
+
 h1 {
-  text-align: center;
   font-weight: 300;
   font-size: 5rem; }
+
+button {
+  border: none;
+  color: white;
+  background-color: #2288ff;
+  border-radius: 0.5rem;
+  padding: 1rem; }
+
+.rewrite-container {
+  display: grid;
+  justify-items: center; }
+  .rewrite-container form {
+    display: flex;
+    column-gap: 1.5rem;
+    align-items: center; }
+    .rewrite-container form input {
+      min-width: 40rem; }
+    .rewrite-container form * {
+      font-size: 2.5rem; }
+  .rewrite-container #switch-headline {
+    margin-top: 3rem; }
+    .rewrite-container #switch-headline button {
+      color: blue;
+      background-color: white;
+      text-decoration: underline;
+      cursor: pointer; }
+  .rewrite-container ul {
+    list-style: none;
+    font-size: 2rem; }
+    .rewrite-container ul li {
+      margin-top: 0.5rem; }
+
+#main-rewrite-container h2 {
+  font-size: 3rem; }
+
+nav {
+  float: left; }

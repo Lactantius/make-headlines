@@ -9,7 +9,7 @@ class RewriteForm(FlaskForm):
     """Form for submitting a rewrite to the server"""
 
     text = StringField(
-        "New Headline", validators=[InputRequired(), Length(min=1, max=500)]
+        "Rewrite Headline", validators=[InputRequired(), Length(min=1, max=500)]
     )
 
 

@@ -1,9 +1,73 @@
+$button-color: #2288ff;
+
 :root {
   font-size: 62.5%;
 }
 
-h1 {
+body {
+  font-family: "Open Sans", sans-serif;
+  font-size: 1.5rem;
+}
+
+h1,
+h2 {
   text-align: center;
+}
+
+h1 {
   font-weight: 300;
   font-size: 5rem;
+}
+
+button {
+  border: none;
+  color: white;
+  background-color: $button-color;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.rewrite-container {
+  display: grid;
+  justify-items: center;
+
+  form {
+    display: flex;
+    column-gap: 1.5rem;
+    align-items: center;
+
+    input {
+      min-width: 40rem;
+    }
+    * {
+      font-size: 2.5rem;
+    }
+  }
+  #switch-headline {
+    margin-top: 3rem;
+    button {
+      color: blue;
+      background-color: white;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  ul {
+    list-style: none;
+    font-size: 2rem;
+    li {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+#main-rewrite-container {
+  h2 {
+    font-size: 3rem;
+  }
+}
+
+nav {
+  float: left;
 }
