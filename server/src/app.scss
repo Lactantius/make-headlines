@@ -7,16 +7,19 @@ $button-color: #2288ff;
 body {
   font-family: "Open Sans", sans-serif;
   font-size: 1.5rem;
+  display: grid;
 }
 
 h1,
 h2 {
+  font-family: "Oswald", sans-serif;
   text-align: center;
 }
 
 h1 {
-  font-weight: 300;
-  font-size: 5rem;
+  margin-top: 8rem;
+  font-weight: 200;
+  font-size: 8rem;
 }
 
 button {
@@ -25,16 +28,27 @@ button {
   background-color: $button-color;
   border-radius: 0.5rem;
   padding: 1rem;
+  font-size: 2rem;
 }
 
 .rewrite-container {
   display: grid;
   justify-items: center;
+  margin-bottom: 5rem;
+
+  a {
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: black;
+  }
 
   form {
     display: flex;
     column-gap: 1.5rem;
     align-items: center;
+    width: auto;
 
     input {
       min-width: 40rem;
@@ -70,4 +84,17 @@ button {
 
 nav {
   float: left;
+}
+
+.user-form {
+  display: grid;
+  width: 30rem;
+  justify-self: center;
+  input {
+    margin-bottom: 1.5rem;
+  }
+}
+
+p {
+  text-align: center;
 }

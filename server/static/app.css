@@ -3,30 +3,42 @@
 
 body {
   font-family: "Open Sans", sans-serif;
-  font-size: 1.5rem; }
+  font-size: 1.5rem;
+  display: grid; }
 
 h1,
 h2 {
+  font-family: "Oswald", sans-serif;
   text-align: center; }
 
 h1 {
-  font-weight: 300;
-  font-size: 5rem; }
+  margin-top: 8rem;
+  font-weight: 200;
+  font-size: 8rem; }
 
 button {
   border: none;
   color: white;
   background-color: #2288ff;
   border-radius: 0.5rem;
-  padding: 1rem; }
+  padding: 1rem;
+  font-size: 2rem; }
 
 .rewrite-container {
   display: grid;
-  justify-items: center; }
+  justify-items: center;
+  margin-bottom: 5rem; }
+  .rewrite-container a {
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: black; }
   .rewrite-container form {
     display: flex;
     column-gap: 1.5rem;
-    align-items: center; }
+    align-items: center;
+    width: auto; }
     .rewrite-container form input {
       min-width: 40rem; }
     .rewrite-container form * {
@@ -49,3 +61,13 @@ button {
 
 nav {
   float: left; }
+
+.user-form {
+  display: grid;
+  width: 30rem;
+  justify-self: center; }
+  .user-form input {
+    margin-bottom: 1.5rem; }
+
+p {
+  text-align: center; }
