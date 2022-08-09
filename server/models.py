@@ -80,6 +80,8 @@ class Headline(db.Model):
 
     date = db.Column(db.Date, nullable=False)
 
+    url = db.Column(db.String)
+
     source_id = db.Column(
         UUID(as_uuid=True), db.ForeignKey("sources.id"), nullable=False
     )
@@ -89,7 +91,7 @@ class Headline(db.Model):
     )
 
 
-def new_headline(text: str, date: date, source_id: UUID) -> Headline:
+def new_headline(text: str, date: date, source_id: UUID, url="") -> Headline:
     """
     Make new headline object
     Does not store headline in database
@@ -97,7 +99,9 @@ def new_headline(text: str, date: date, source_id: UUID) -> Headline:
 
     score = calc_sentiment_score(text)
 
-    return Headline(text=text, date=date, source_id=source_id, sentiment_score=score)
+    return Headline(
+        text=text, date=date, source_id=source_id, url=url, sentiment_score=score
+    )
 
 
 # def calc_sentiment_score(text: str) -> float:
@@ -119,6 +123,8 @@ class Source(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
     name = db.Column(db.String)
+
+    url = db.Column(db.String)
 
     # Political alignment
     alignment = db.Column(db.String)

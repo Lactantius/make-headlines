@@ -14,6 +14,10 @@ const rewriteDisplay = document.querySelector(
   "#rewrite-list"
 ) as HTMLParagraphElement;
 
+const switchHeadlineForm = document.querySelector(
+  "#switch-headline"
+) as HTMLFormElement;
+
 /*
  * Event Listeners
  */
@@ -23,6 +27,10 @@ rewriteForm.addEventListener("submit", (evt) => {
   rewriteFormHandler();
 });
 
+switchHeadlineForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  replaceHeadline();
+});
 /*
  * Main Form Functions
  */
