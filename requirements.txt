@@ -73,7 +73,7 @@ tabulate==0.8.10
 threadpoolctl==3.1.0
 tokenizers==0.12.1
 tomli==2.0.1
-torch==1.12.0+cpu # Would be nice to remove +cpu reduces package size considerably
+torch==1.12.1+cpu # Would be nice to remove +cpu reduces package size considerably
 tqdm==4.64.0
 transformers==4.21.1
 typing_extensions==4.3.0
