@@ -1,3 +1,4 @@
+-f https://download.pytorch.org/whl/torch_stable.html
 attrs==22.1.0
 bcrypt==3.2.2
 beautifulsoup4==4.11.1
