@@ -4,3 +4,4 @@ venv
 *.js
 *.css
 postgres-data
+sentiment-en-mix-distillbert_4.pt

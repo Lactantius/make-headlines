@@ -36,10 +36,7 @@ from server.fake_module import new_module
 from flair.models import TextClassifier
 from flair.data import Sentence
 
-try:
-    classifier = TextClassifier.load("./models/sentiment-en-mix-distillbert_4.pt")
-except:
-    classifier = TextClassifier.load("sentiment")
+classifier = TextClassifier.load("sentiment")
 
 
 def calc_sentiment_score(sentence: str) -> float:

@@ -6,7 +6,13 @@ from server import create_app
 from server.models import Headline, Rewrite, User
 import pytest
 
-from .fixtures import set_config_variables, seed_database
+from .fixtures import (
+    seed_database,
+    set_config_variables,
+    client,
+    rollback_db,
+    user,
+)
 
 
 def test_index(client: FlaskClient, user: User):
@@ -77,20 +83,3 @@ def test_logout(client: FlaskClient, user: User) -> None:
         assert res.status_code == 200
         assert b"Logged out successfully" in res.data
         assert "user_id" not in session
-
-
-@pytest.fixture
-def client(set_config_variables) -> FlaskClient:
-
-    return set_config_variables.test_client()
-
-
-@pytest.fixture
-def user(client) -> User:
-    """Add user to session and return"""
-
-    user = User.query.filter(User.username == "test_user").one()
-    with client.session_transaction() as session:
-        session["user_id"] = user.id
-
-    return user

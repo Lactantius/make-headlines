@@ -5,22 +5,17 @@ from server import create_app
 from server.models import Headline, Rewrite, User
 import pytest
 
-from .fixtures import seed_database, set_config_variables, client, rollback_db
+from .fixtures import seed_database, set_config_variables, client, rollback_db, user
 
 ##############################################################################
 # Rewrites endpoint
 #
 
 
-def test_submit_rewrite(client, user, set_config_variables):
+def test_submit_rewrite(client, user):
     """Can a user submit a rewrite for a headline?"""
 
-    # app = create_app()
-    app = set_config_variables
-    app.app_context().push()
-    with app.test_client():
-
-        # with client:
+    with client:
 
         headline = Headline.query.filter(
             Headline.text == "A great thing happened"
@@ -119,14 +114,3 @@ def test_get_random_headline(client):
 
         assert res.status_code == 200
         assert res.json["headline"]["text"] != None
-
-
-@pytest.fixture
-def user(client) -> User:
-    """Add user to session and return"""
-
-    user = User.query.filter(User.username == "test_user").one()
-    with client.session_transaction() as session:
-        session["user_id"] = user.id
-
-    return user

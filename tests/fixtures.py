@@ -4,7 +4,7 @@ import pytest
 from server import create_app, db
 from datetime import date
 from flask import Flask
-from flask.testing import FlaskClient
+from flask.testing import FlaskCliRunner, FlaskClient
 from server.models import (
     User,
     Rewrite,
@@ -33,6 +33,17 @@ def set_config_variables() -> Flask:
 def client(set_config_variables) -> FlaskClient:
 
     return set_config_variables.test_client()
+
+
+@pytest.fixture
+def user(client) -> User:
+    """Add user to session and return"""
+
+    user = User.query.filter(User.username == "test_user").one()
+    with client.session_transaction() as session:
+        session["user_id"] = user.id
+
+    return user
 
 
 @pytest.fixture(autouse=True)
