@@ -5,3 +5,4 @@ venv
 *.css
 postgres-data
 sentiment-en-mix-distillbert_4.pt
+.pytest_cache
