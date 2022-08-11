@@ -31,6 +31,8 @@ def parse_nytimes_date(datestring: str | None) -> datetime | None:
 
 def send_to_database(source):
     data = get_nytimes_headlines()
+    print(data)
     for item in data:
+        print(item)
         db.session.add(new_headline(**item, source_id=source.id))
     db.session.commit()

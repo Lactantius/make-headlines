@@ -3,7 +3,6 @@ from uuid import uuid4
 from flask import Flask
 
 import os
-from unittest import TestCase
 from flask.testing import FlaskClient
 from sqlalchemy.exc import IntegrityError
 import pytest
@@ -19,8 +18,8 @@ from server.models import (
     new_headline,
     authenticate_user,
 )
-from server.app import app
-from fixtures import set_config_variables, seed_database
+from server import create_app
+from .fixtures import set_config_variables, seed_database
 
 ##############################################################################
 # User model tests
@@ -93,7 +92,7 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
 @pytest.fixture
 def client() -> FlaskClient:
 
-    return app.test_client()
+    return create_app().test_client()
 
 
 @pytest.fixture

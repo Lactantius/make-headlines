@@ -2,11 +2,11 @@
 
 from flask import request, session
 from flask.testing import FlaskClient
-from server.app import app
+from server import create_app
 from server.models import Headline, Rewrite, User
 import pytest
 
-from fixtures import set_config_variables, seed_database
+from .fixtures import set_config_variables, seed_database
 
 
 def test_index(client: FlaskClient, user: User):
@@ -80,9 +80,9 @@ def test_logout(client: FlaskClient, user: User) -> None:
 
 
 @pytest.fixture
-def client() -> FlaskClient:
+def client(set_config_variables) -> FlaskClient:
 
-    return app.test_client()
+    return set_config_variables.test_client()
 
 
 @pytest.fixture

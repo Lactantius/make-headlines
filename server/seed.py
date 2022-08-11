@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
-
 from server.models import User, Headline, Rewrite, Source
-from server import db
+from server import db, create_app
 from server.feeds import send_to_database
 
 
@@ -25,4 +23,19 @@ def add_sources():
 
 def add_headlines():
     nytimes = Source.query.filter(Source.name == "New York Times").one()
+    print("Adding to database")
     send_to_database(nytimes)
+
+
+def seed():
+    """Seed all"""
+
+    with create_app().app_context():
+        reset_database()
+        add_sources()
+        add_headlines()
+
+
+if __name__ == "__main__":
+
+    seed()

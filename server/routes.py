@@ -12,6 +12,7 @@ from flask import (
     request,
     jsonify,
     session,
+    Blueprint,
 )
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID

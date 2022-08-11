@@ -1,21 +1,26 @@
 """Test API endpoints"""
 
 from flask.testing import FlaskClient
-from server.app import app
+from server import create_app
 from server.models import Headline, Rewrite, User
 import pytest
 
-from fixtures import seed_database, set_config_variables
+from .fixtures import seed_database, set_config_variables, client, rollback_db
 
 ##############################################################################
 # Rewrites endpoint
 #
 
 
-def test_submit_rewrite(client, user):
+def test_submit_rewrite(client, user, set_config_variables):
     """Can a user submit a rewrite for a headline?"""
 
-    with client:
+    # app = create_app()
+    app = set_config_variables
+    app.app_context().push()
+    with app.test_client():
+
+        # with client:
 
         headline = Headline.query.filter(
             Headline.text == "A great thing happened"
@@ -23,7 +28,10 @@ def test_submit_rewrite(client, user):
 
         res = client.post(
             "/api/rewrites",
-            json={"text": "Something definitely happened", "headline_id": headline.id},
+            json={
+                "text": "Something definitely happened",
+                "headline_id": headline.id,
+            },
         )
 
         assert res.status_code == 201
@@ -91,11 +99,11 @@ def test_rate_limit_unauthenticated_users(client):
         }
 
 
-def test_get_all_headlines_for_user(client, user):
-    """Can a logged in user get all rewrites?"""
+# def test_get_all_headlines_for_user(client, user):
+#     """Can a logged in user get all rewrites?"""
 
-    with client:
-        res = client.get(f"/api/users/{user.id}/rewrites")
+#     with client:
+#         res = client.get(f"/api/users/{user.id}/rewrites")
 
 
 ##############################################################################
@@ -111,12 +119,6 @@ def test_get_random_headline(client):
 
         assert res.status_code == 200
         assert res.json["headline"]["text"] != None
-
-
-@pytest.fixture
-def client() -> FlaskClient:
-
-    return app.test_client()
 
 
 @pytest.fixture

@@ -1,14 +1,16 @@
 """Reused fixtures"""
 
 import pytest
-from server.app import app
+from server import create_app, db
 from datetime import date
+from flask import Flask
+from flask.testing import FlaskClient
 from server.models import (
     User,
     Rewrite,
     Source,
     Headline,
-    db,
+    # db,
     new_user,
     new_headline,
     new_rewrite,
@@ -16,16 +18,33 @@ from server.models import (
 
 
 @pytest.fixture(scope="session", autouse=True)
-def set_config_variables() -> None:
+def set_config_variables() -> Flask:
+    app = create_app()
     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///headlines_test"
 
     app.config["TESTING"] = True
     app.config["DEBUG_TB_HOSTS"] = ["dont-show-debug-toolbar"]
     app.config["WTF_CSRF_ENABLED"] = False
 
+    return app
+
+
+@pytest.fixture
+def client(set_config_variables) -> FlaskClient:
+
+    return set_config_variables.test_client()
+
+
+@pytest.fixture(autouse=True)
+def rollback_db() -> None:
+    db.session.rollback()
+
 
 @pytest.fixture(scope="module", autouse=True)
-def seed_database() -> None:
+def seed_database(set_config_variables) -> None:
+
+    # create_app().app_context().push()
+    set_config_variables.app_context().push()
 
     db.session.rollback()
     db.drop_all()

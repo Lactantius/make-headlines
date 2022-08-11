@@ -16,9 +16,10 @@ def create_app():
     app = Flask(__name__, instance_relative_config=False)
     # app.config.from_object("config.Config")
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
-        "SQLALCHEMY_DATABASE_URI", "postgresql+psycopg2://test:test@0.0.0.0:5401/test"
+        "SQLALCHEMY_DATABASE_URI",
+        "postgresql:///headlines_test",  # "postgresql+psycopg2://test:test@0.0.0.0:5401/test"
     )
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
     app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET")
 
