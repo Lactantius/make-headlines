@@ -11,14 +11,16 @@ from datetime import date, datetime
 from server.analysis import calc_sentiment_score
 
 bcrypt = Bcrypt()
-db = SQLAlchemy()
+from . import db
+
+# db = SQLAlchemy()
 
 
-def connect_db(app):
-    """Connect to database"""
+# def connect_db(app):
+#     """Connect to database"""
 
-    db.app = app
-    db.init_app(app)
+#     db.app = app
+#     db.init_app(app)
 
 
 ##############################################################################

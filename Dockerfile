@@ -7,6 +7,7 @@ WORKDIR /
 
 #copy all the files
 COPY . .
+COPY ./server/models/sentiment-en-mix-distillbert_4.pt /root/.flair/models/sentiment-en-mix-distillbert_4.pt
 
 #Install the dependencies
 RUN apt-get -y update

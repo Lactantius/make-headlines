@@ -2,4 +2,4 @@
 
 set -e
 #flask db upgrade
-gunicorn app:app --timout 45
+gunicorn -c gunicorn.config.py wsgi:app

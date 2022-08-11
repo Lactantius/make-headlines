@@ -8,6 +8,7 @@ services:
     environment:
       STAGE: test
       SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://test:test@db/test
+      FLASK_SECRET: "this is definitely secret"
     networks:
       - default
     ports:

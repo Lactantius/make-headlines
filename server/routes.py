@@ -1,8 +1,9 @@
-"""News sentiment tracker"""
+"""Routes"""
 
 from functools import wraps
 from uuid import uuid4
 from flask import (
+    current_app as app,
     Flask,
     Response,
     flash,
@@ -18,10 +19,11 @@ from sqlalchemy.exc import DatabaseError, IntegrityError
 import os
 from sqlalchemy.sql import func
 
+from . import db
+
 from server.models import (
     authenticate_user,
-    db,
-    connect_db,
+    # db,
     User,
     Headline,
     Source,
@@ -36,26 +38,26 @@ from server.forms import RewriteForm, SignupForm, LoginForm
 
 # from forms import RewriteForm
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
 # From https://help.heroku.com/ZKNTJQSK/why-is-sqlalchemy-1-4-x-not-connecting-to-heroku-postgres
-uri = os.environ.get("DATABASE_URL", "postgresql:///headlines_dev")
-if uri and uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
+# uri = os.environ.get("DATABASE_URL", "postgresql:///headlines_dev")
+# if uri and uri.startswith("postgres://"):
+#     uri = uri.replace("postgres://", "postgresql://", 1)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = uri
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
-app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET")
+# app.config["SQLALCHEMY_DATABASE_URI"] = uri
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
+# app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET")
 
-if os.getenv("FLASK_ENV") == "development":
-    from flask_debugtoolbar import DebugToolbarExtension
+# if os.getenv("FLASK_ENV") == "development":
+#     from flask_debugtoolbar import DebugToolbarExtension
 
-    toolbar = DebugToolbarExtension(app)
-    app.config["SQLALCHEMY_ECHO"] = True
+#     toolbar = DebugToolbarExtension(app)
+#     app.config["SQLALCHEMY_ECHO"] = True
 
-connect_db(app)
-db.create_all()
+# connect_db(app)
+# db.create_all()
 
 ##############################################################################
 # Decorators

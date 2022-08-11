@@ -2,7 +2,8 @@ import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from server.models import new_headline, db
+from server.models import new_headline  # , db
+from server import db
 
 
 def get_nytimes_headlines():

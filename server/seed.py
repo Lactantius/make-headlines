@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from server.models import User, Headline, Rewrite, Source
-from server.app import db
+from server import db
 from server.feeds import send_to_database
 
 
