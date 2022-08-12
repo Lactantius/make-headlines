@@ -5,9 +5,10 @@ Rewrite headlines from news organizations to change the positive/negative sentim
 ** Install/Deploy
 
 1. Download [[https://nlp.informatik.hu-berlin.de/resources/models/sentiment-curated-distilbert/sentiment-en-mix-distillbert_4.pt][the very large sentiment model]], or some other model, to ~server/models/~. (It will otherwise download it automatically, but you will have to do that every time you build a docker image.)
-2. ~docker compose up~
-3. ~docker exec sentimental-headlines-web-1 python3 -m server.seed~ (Will make this unnecessary soon.)
-4. Served at localhost:5000. It must be changed in both ~gunicorn.config.py~ and ~docker-compose.yml~.
+2. Change the secrets in ~.env~
+3. ~docker compose up~
+4. ~docker exec sentimental-headlines-web-1 python3 -m server.seed~ (Will make this unnecessary soon.)
+5. Served at localhost:5000. It must be changed in both ~gunicorn.config.py~ and ~docker-compose.yml~.
 
 ** TODO
 
