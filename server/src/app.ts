@@ -122,6 +122,10 @@ function replaceHeadline() {
       "href",
       headline.url
     );
+    const source = document.createElement('span')
+    source.classList.add("headline-source")
+    source.innerText = ` Source: ${headline.source}`
+    headlineElement.append(source)
   });
 }
 

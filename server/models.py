@@ -198,33 +198,6 @@ def new_rewrite(text: str, headline: Headline, user_id: UUID) -> Rewrite:
 #     }
 
 
-def serialize(obj: (Headline | Rewrite)) -> dict[str, (str | float)]:
-    """Return serialized headline"""
-
-    match obj:
-        case Headline():
-            return {
-                "id": obj.id,
-                "text": obj.text,
-                "sentiment_score": obj.sentiment_score,
-                "date": obj.date,
-                "source_id": obj.source_id,
-                "url": obj.url,
-            }
-
-        case Rewrite():
-            return {
-                "id": obj.id,
-                "text": obj.text,
-                "sentiment_score": obj.sentiment_score,
-                "sentiment_match": obj.sentiment_match,
-                "semantic_match": obj.semantic_match,
-                "user_id": obj.user_id,
-                "headline_id": obj.headline_id,
-                "timestamp": obj.timestamp,
-            }
-
-
 def calc_semantic_match(rewrite: str, headline: str) -> float:
     """TODO Use Gensim"""
 
@@ -259,3 +232,31 @@ def new_anon_user():
     """
 
     return User(username=uuid.uuid4(), email=uuid.uuid4(), anonymous=True)
+
+
+def serialize(obj: (Headline | Rewrite)) -> dict[str, (str | float)]:
+    """Return serialized headline"""
+
+    match obj:
+        case Headline():
+            return {
+                "id": obj.id,
+                "text": obj.text,
+                "sentiment_score": obj.sentiment_score,
+                "date": obj.date,
+                "source_id": obj.source_id,
+                "source": obj.source.name,
+                "url": obj.url,
+            }
+
+        case Rewrite():
+            return {
+                "id": obj.id,
+                "text": obj.text,
+                "sentiment_score": obj.sentiment_score,
+                "sentiment_match": obj.sentiment_match,
+                "semantic_match": obj.semantic_match,
+                "user_id": obj.user_id,
+                "headline_id": obj.headline_id,
+                "timestamp": obj.timestamp,
+            }

@@ -42,6 +42,16 @@ button {
     text-transform: uppercase;
     text-decoration: none;
     color: black;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .headline-source {
+      font-size: 60%;
+    }
   }
 
   form {
