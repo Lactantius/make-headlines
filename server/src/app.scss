@@ -8,6 +8,7 @@ body {
   font-family: "Open Sans", sans-serif;
   font-size: 1.5rem;
   display: grid;
+  margin: 0;
 }
 
 h1,
@@ -29,6 +30,7 @@ button {
   border-radius: 0.5rem;
   padding: 1rem;
   font-size: 2rem;
+  cursor: pointer;
 }
 
 .rewrite-container {
@@ -50,7 +52,7 @@ button {
     }
 
     .headline-source {
-      font-size: 60%;
+      font-size: 50%;
     }
   }
 
@@ -93,7 +95,20 @@ button {
 }
 
 nav {
-  float: left;
+  display: flex;
+  gap: 2rem;
+  color: white;
+  font-size: 2rem;
+  background-color: black;
+  padding: 1rem;
+  a {
+    color: white;
+    text-decoration: none;
+  }
+  button {
+    padding: 0;
+    background: none;
+  }
 }
 
 .user-form {
