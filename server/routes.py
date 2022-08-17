@@ -49,25 +49,23 @@ def rate_limit(route):
     @wraps(route)
     def wrapper(*args, **kwargs):
 
-        try:
-            current_user = User.query.get(session["user_id"])
-        except (KeyError, DatabaseError):
+        current_user = Failure(session.get("user_id")).bind(User.query.get)
+        if not current_user.value:
 
             # This allows the system to have a unique user ID for every rewrite in the system, and to
             # potentially replace the anon user with a real user after login
             anon_user = new_anon_user()
-            db.session.add(anon_user)
-            db.session.commit()
+            committed_anon = safe_commit(anon_user)
 
             session["requests_remaining"] = 2
-            session["user_id"] = anon_user.id
-            return route(*args, **kwargs, current_user=anon_user.id)
+            session["user_id"] = committed_anon[1].id
+            return route(*args, **kwargs, current_user=committed_anon[1].id)
 
-        if current_user.anonymous:
+        if current_user.value.anonymous:
             requests_remaining = session.get("requests_remaining", 0)
             if requests_remaining > 0:
                 session["requests_remaining"] = requests_remaining - 1
-                return route(*args, **kwargs, current_user=current_user.id)
+                return route(*args, **kwargs, current_user=current_user.value.id)
             else:
                 return (
                     jsonify(error="Please login before making additional requests."),
@@ -75,7 +73,7 @@ def rate_limit(route):
                 )
 
         else:
-            return route(*args, **kwargs, current_user=current_user.id)
+            return route(*args, **kwargs, current_user=current_user.value.id)
 
     return wrapper
 
@@ -85,12 +83,9 @@ def get_user(route):
 
     @wraps(route)
     def wrapper(*args, **kwargs):
-        try:
-            user = User.query.get(session["user_id"])
-        except (KeyError, DatabaseError):
-            return route(*args, **kwargs, current_user=None)
 
-        return route(*args, **kwargs, current_user=user)
+        user = Failure(session.get("user_id")).bind(User.query.get)
+        return route(*args, **kwargs, current_user=user.value)
 
     return wrapper
 
@@ -105,28 +100,19 @@ def get_user(route):
 def submit_rewrite(current_user: UUID) -> tuple[Response, int]:
     """Submit headline rewrite"""
 
-    try:
-        text = request.json["text"]
-        headline_id = request.json["headline_id"]
-    except KeyError:
+    text = request.json.get("text")
+    headline_id = request.json.get("headline_id")
+    if not text or not headline_id:
         return (jsonify(error="Malformed json request."), 400)
 
-    try:
-        headline = Headline.query.get(headline_id)
-    except DatabaseError:
+    headline = Failure(headline_id).bind(Headline.query.get)
+    if not headline.value:
         return (jsonify(error="Headline not found."), 404)
 
-    rewrite = new_rewrite(text=text, headline=headline, user_id=current_user)
+    rewrite = new_rewrite(text=text, headline=headline.value, user_id=current_user)
     committed_rewrite = safe_commit(rewrite)
     if committed_rewrite[0] == "failure":
         return (jsonify(error="Error saving to database."), 500)
-    # db.session.add(rewrite)
-
-    # try:
-    #     db.session.commit()
-    # except IntegrityError:
-    #     db.session.rollback()
-    #     return (jsonify(error="Error saving to database."), 500)
 
     return (jsonify(rewrite=serialize(committed_rewrite[1])), 201)
 
@@ -248,10 +234,8 @@ def login_page(current_user):
 @app.post("/logout")
 def logout():
     """Logout user and redirect to index"""
-    try:
+    if session.get("user_id"):
         session.pop("user_id")
-    except KeyError:
-        return redirect("/")
 
     flash("Logged out successfully", "success")
     return redirect("/")
