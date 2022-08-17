@@ -180,6 +180,14 @@ def index(current_user=None):
     return render_template("index.html", form=form, user=current_user)
 
 
+@app.get("/about")
+@get_user
+def about(current_user):
+    """Get about page"""
+
+    return render_template("about.html", user=current_user)
+
+
 @app.route("/signup", methods=["GET", "POST"])
 @get_user
 def signup_page(current_user):
