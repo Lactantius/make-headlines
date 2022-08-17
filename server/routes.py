@@ -117,15 +117,18 @@ def submit_rewrite(current_user: UUID) -> tuple[Response, int]:
         return (jsonify(error="Headline not found."), 404)
 
     rewrite = new_rewrite(text=text, headline=headline, user_id=current_user)
-    db.session.add(rewrite)
-
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
+    committed_rewrite = safe_commit(rewrite)
+    if committed_rewrite[0] == "failure":
         return (jsonify(error="Error saving to database."), 500)
+    # db.session.add(rewrite)
 
-    return (jsonify(rewrite=serialize(rewrite)), 201)
+    # try:
+    #     db.session.commit()
+    # except IntegrityError:
+    #     db.session.rollback()
+    #     return (jsonify(error="Error saving to database."), 500)
+
+    return (jsonify(rewrite=serialize(committed_rewrite[1])), 201)
 
 
 @app.get("/api/headlines/random")
@@ -206,11 +209,11 @@ def signup_page(current_user):
             username=form.username.data, email=form.email.data, pwd=form.password.data
         )
         committed_user = safe_commit(user)
-        if committed_user.errors:
+        if committed_user[0] == "failure":
             flash("That username or email is already in use.", "danger")
             return redirect("/signup")
 
-        session["user_id"] = user.id
+        session["user_id"] = committed_user[1].id
         flash("Thanks for signing up.", "success")
         return redirect("/")
 

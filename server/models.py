@@ -228,10 +228,16 @@ def new_user(username: str, email: str, pwd: str) -> User:
     )
 
 
-def safe_commit(obj):
-    """Add and commit object to the database"""
+def safe_commit(obj: object) -> tuple[str, object]:
+    # return Failure(obj).bind(db.session.add).bind(db.session.commit)
+    db.session.add(obj)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return ("failure", obj)
 
-    return Failure(obj).bind(db.session.add).bind(db.session.commit)
+    return ("success", obj)
 
 
 def new_anon_user():
