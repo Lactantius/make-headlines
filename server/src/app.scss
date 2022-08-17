@@ -150,3 +150,21 @@ article {
   font-size: 4rem;
   text-transform: uppercase;
 }
+
+.messages {
+  margin: auto;
+  margin-top: 2rem;
+  border-radius: 0.5rem;
+  list-style: none;
+  .message {
+    padding: 2rem;
+  }
+  .success {
+    color: green;
+    background-color: rgba(0, 255, 0, 0.1);
+  }
+  .danger {
+    color: #bb0000;
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+}

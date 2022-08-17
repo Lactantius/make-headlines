@@ -25,6 +25,8 @@
             </p>
         <![endif]-->
 
+        {% include 'nav.html' %}
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <ul class="messages">
@@ -35,7 +37,6 @@
         {% endif %}
         {% endwith %}
 
-        {% include 'nav.html' %}
 
         {% block content %}{% endblock %}
     </body>
