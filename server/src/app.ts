@@ -63,7 +63,7 @@ function rewriteFormHandler(
     headline_id: headlineId,
   };
   const rewrite: Promise<Rewrite> = sendRewrite(requestBody);
-  showRewrite(rewrite, rewriteList);
+  displayRewrite(rewrite, rewriteList);
 }
 
 interface Rewrite {
@@ -80,20 +80,29 @@ interface Rewrite {
   };
 }
 
-function showRewrite(
-  rewrite: Promise<Rewrite>,
+interface Error {
+  error: string;
+}
+
+function displayRewrite(
+  rewrite: Promise<Rewrite | Error>,
   rewriteList: HTMLUListElement
 ): void {
   const li = document.createElement("li");
 
-  rewrite.then(
-    (r) =>
-    (li.innerText = `${r.rewrite.text} | Score: ${calculateScore(
-      r.rewrite.sentiment_match
-    )}`)
-  );
+  rewrite.then((r) => (li.innerText = formatRewrite(r)));
   rewriteList.prepend(li);
   rewriteList.style.display = "block";
+}
+
+function formatRewrite(data: Rewrite | Error): string {
+  if ("rewrite" in data) {
+    return `${data.rewrite.text} | Score: ${calculateScore(
+      data.rewrite.sentiment_match
+    )}`;
+  } else {
+    return data.error;
+  }
 }
 
 function calculateScore(match: number): number {
@@ -128,13 +137,9 @@ function replaceHeadline() {
 
     const source = document.createElement("span");
     source.classList.add("headline-source");
-    source.innerText = ` Source: ${headline.source}`;
+    source.innerText = ` Source: ${headline.source} `;
     headlineElement.append(source);
 
-    // const affect = document.createElement("p");
-    // affect.classList.add("headline-affect");
-    // affect.innerText = calculateAffect(headline.sentiment_score);
-    // parentAnchor.append(affect);
     affectP.innerText = calculateAffect(headline.sentiment_score);
   });
 }
@@ -142,9 +147,9 @@ function replaceHeadline() {
 function calculateAffect(score: number): string {
   const rounded = Math.round(score * 100);
   if (rounded < 0) {
-    return `Negative (${rounded * -1}% certainty)`;
+    return `Negative(${rounded * -1}% certainty)`;
   } else if (rounded > 0) {
-    return `Positive (${rounded}% certainty)`;
+    return `Positive(${rounded}% certainty)`;
   } else {
     return "Neutral";
   }
