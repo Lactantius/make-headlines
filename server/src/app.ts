@@ -116,17 +116,35 @@ function sendRewrite(data: RewriteRequest) {
 
 function replaceHeadline() {
   getHeadline().then((headline) => {
+    const parentAnchor = headlineElement.parentElement as HTMLAnchorElement;
     headlineElement.innerText = headline.text;
     headlineElement.dataset.id = headline.id;
     (headlineElement.parentElement as HTMLAnchorElement).setAttribute(
       "href",
       headline.url
     );
-    const source = document.createElement('span')
-    source.classList.add("headline-source")
-    source.innerText = ` Source: ${headline.source}`
-    headlineElement.append(source)
+
+    const source = document.createElement("span");
+    source.classList.add("headline-source");
+    source.innerText = ` Source: ${headline.source}`;
+    headlineElement.append(source);
+
+    const affect = document.createElement("p");
+    affect.classList.add("headline-affect");
+    affect.innerText = calculateAffect(headline.sentiment_score);
+    parentAnchor.append(affect);
   });
+}
+
+function calculateAffect(score: number): string {
+  const rounded = Math.round(score * 100);
+  if (rounded < 0) {
+    return `Negative: ${rounded * -1}% certainty`;
+  } else if (rounded > 0) {
+    return `Positive: ${rounded}% certainty`;
+  } else {
+    return "Neutral";
+  }
 }
 
 function getHeadline() {

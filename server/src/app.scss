@@ -44,15 +44,22 @@ button {
     text-transform: uppercase;
     text-decoration: none;
     color: black;
+    margin-bottom: 2rem;
 
     h2 {
       display: flex;
       align-items: center;
       gap: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     .headline-source {
       font-size: 50%;
+    }
+
+    .headline-affect {
+      font-weight: 400;
+      //font-size: 50%;
     }
   }
 
