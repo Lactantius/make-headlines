@@ -90,13 +90,18 @@ button {
   ul {
     list-style: none;
     font-size: 2rem;
+    width: 30%;
+    background-color: #eee;
+    padding: 3rem;
+    display: none;
     li {
-      margin-top: 0.5rem;
+      margin-top: 1rem;
     }
   }
 }
 
 #main-rewrite-container {
+  margin-bottom: 15rem;
   h2 {
     font-size: 3rem;
   }
@@ -138,4 +143,10 @@ article {
   p {
     text-align: left;
   }
+}
+
+#previous-headlines {
+  display: none;
+  font-size: 4rem;
+  text-transform: uppercase;
 }

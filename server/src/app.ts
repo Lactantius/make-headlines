@@ -93,6 +93,7 @@ function showRewrite(
     )}`)
   );
   rewriteList.prepend(li);
+  rewriteList.style.display = "block";
 }
 
 function calculateScore(match: number): number {
@@ -163,6 +164,7 @@ function moveHeadline() {
   //(rewriteContainer.querySelector("p") as HTMLParagraphElement).remove();
   const oldHeadline = rewriteContainer.cloneNode(true) as HTMLDivElement;
   mainRewriteDisplay.replaceChildren("");
+  mainRewriteDisplay.style.display = "none";
   /* Remove button to switch the headline */
   (oldHeadline.querySelector("#switch-headline") as HTMLFormElement).remove();
 
@@ -180,6 +182,11 @@ function moveHeadline() {
     rewriteFormHandler(ul, input.value, headline.dataset.id as string);
     form.reset();
   });
+
+  (
+    document.querySelector("#previous-headlines") as HTMLHeadingElement
+  ).style.display = "block";
+
   oldRewrites.prepend(oldHeadline);
 }
 
