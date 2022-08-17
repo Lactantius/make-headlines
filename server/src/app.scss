@@ -36,6 +36,7 @@ button {
 .rewrite-container {
   display: grid;
   justify-items: center;
+  margin-top: 5rem;
   margin-bottom: 5rem;
 
   a {
@@ -57,7 +58,7 @@ button {
       font-size: 50%;
     }
 
-    .headline-affect {
+    p {
       font-weight: 400;
       //font-size: 50%;
     }

@@ -17,6 +17,7 @@ const mainRewriteDisplay = document.querySelector(
   "#rewrite-list"
 ) as HTMLUListElement;
 
+const affectP = rewriteContainer.querySelector("p") as HTMLParagraphElement;
 const switchHeadlineForm = document.querySelector(
   "#switch-headline"
 ) as HTMLFormElement;
@@ -129,19 +130,20 @@ function replaceHeadline() {
     source.innerText = ` Source: ${headline.source}`;
     headlineElement.append(source);
 
-    const affect = document.createElement("p");
-    affect.classList.add("headline-affect");
-    affect.innerText = calculateAffect(headline.sentiment_score);
-    parentAnchor.append(affect);
+    // const affect = document.createElement("p");
+    // affect.classList.add("headline-affect");
+    // affect.innerText = calculateAffect(headline.sentiment_score);
+    // parentAnchor.append(affect);
+    affectP.innerText = calculateAffect(headline.sentiment_score);
   });
 }
 
 function calculateAffect(score: number): string {
   const rounded = Math.round(score * 100);
   if (rounded < 0) {
-    return `Negative: ${rounded * -1}% certainty`;
+    return `Negative (${rounded * -1}% certainty)`;
   } else if (rounded > 0) {
-    return `Positive: ${rounded}% certainty`;
+    return `Positive (${rounded}% certainty)`;
   } else {
     return "Neutral";
   }
@@ -158,6 +160,7 @@ function moveHeadline() {
   if (mainRewriteDisplay.children.length === 0) {
     return;
   }
+  //(rewriteContainer.querySelector("p") as HTMLParagraphElement).remove();
   const oldHeadline = rewriteContainer.cloneNode(true) as HTMLDivElement;
   mainRewriteDisplay.replaceChildren("");
   /* Remove button to switch the headline */
