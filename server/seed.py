@@ -26,7 +26,7 @@ def add_sources():
 def add_headlines():
     with create_app().app_context():
         nytimes = Source.query.filter(Source.name == "New York Times").one()
-        print("Adding to database")
+        # print("Adding to database")
         send_to_database(nytimes)
 
 
@@ -39,16 +39,6 @@ def seed():
         add_headlines()
 
 
-def test_scheduler():
-    print("Do stuff")
-
-
 if __name__ == "__main__":
 
     seed()
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=test_scheduler, trigger="interval", seconds=5)
-scheduler.start()
-
-atexit.register(lambda: scheduler.shutdown())

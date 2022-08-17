@@ -14,9 +14,7 @@ from flask import (
     session,
     Blueprint,
 )
-from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.exc import DatabaseError, IntegrityError
 from sqlalchemy.sql import func
 
 import atexit
@@ -40,13 +38,9 @@ from server.models import (
     safe_commit,
 )
 
-
-def test_scheduler():
-    print("Do stuff")
-
-
+# Move this elsewhere
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=add_headlines, trigger="interval", seconds=5)
+scheduler.add_job(func=add_headlines, trigger="interval", hours=3)
 scheduler.start()
 
 atexit.register(lambda: scheduler.shutdown())
