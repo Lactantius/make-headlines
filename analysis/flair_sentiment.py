@@ -9,6 +9,7 @@ processed_sentences = [Sentence(s) for s in sentences]
 
 
 def immut_classifier(s: Sentence):
+    """Classify sentences without changing the original"""
     mutated = s
     classifier.predict(mutated)
     return mutated

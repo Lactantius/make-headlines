@@ -1,12 +1,15 @@
 """User and Headline models"""
 
+from collections.abc import Callable
+from typing import Dict
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import backref
 import uuid
 from flask_bcrypt import Bcrypt
 from datetime import date, datetime
+import traceback
 
 from server.analysis import calc_sentiment_score
 
@@ -35,9 +38,9 @@ class User(db.Model):
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
-    username = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(100), nullable=False, unique=True)
 
-    email = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)
 
     hashed_pwd = db.Column(db.String)
 
@@ -225,6 +228,12 @@ def new_user(username: str, email: str, pwd: str) -> User:
     )
 
 
+def safe_commit(obj):
+    """Add and commit object to the database"""
+
+    return Failure(obj).bind(db.session.add).bind(db.session.commit)
+
+
 def new_anon_user():
     """
     Register a user with placeholders for username and email, so that rewrites can be stored in the database.
@@ -288,3 +297,35 @@ def serialize(
                 "headline_id": obj.headline_id,
                 "timestamp": obj.timestamp,
             }
+
+
+###################################################
+# Monads
+#
+
+
+class Failure:
+    """Monad from https://www.philliams.com/monads-in-python"""
+
+    def __init__(self, value: object = None, errors: Dict = None):
+        self.value = value
+        self.errors = errors
+
+    def bind(self, f: Callable, *args, **kwargs) -> "Failure":
+
+        if self.errors:
+            return Failure(None, errors=self.errors)
+
+        try:
+            result = f(self.value, *args, **kwargs)
+            return Failure(result)
+        except Exception as e:
+
+            failure_status = {
+                "trace": traceback.format_exc(),
+                "exc": e,
+                "args": args,
+                "kwargs": kwargs,
+            }
+
+            return Failure(None, errors=failure_status)

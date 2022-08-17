@@ -32,6 +32,8 @@ from server.models import (
     new_rewrite,
     new_user,
     serialize,
+    Failure,
+    safe_commit,
 )
 from . import db
 
@@ -203,12 +205,9 @@ def signup_page(current_user):
         user = new_user(
             username=form.username.data, email=form.email.data, pwd=form.password.data
         )
-        db.session.add(user)
-
-        try:
-            db.session.commit()
-        except IntegrityError:
-            flash("Invalid username or password.", "danger")
+        committed_user = safe_commit(user)
+        if committed_user.errors:
+            flash("That username or email is already in use.", "danger")
             return redirect("/signup")
 
         session["user_id"] = user.id
