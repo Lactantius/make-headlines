@@ -147,9 +147,9 @@ function replaceHeadline() {
 function calculateAffect(score: number): string {
   const rounded = Math.round(score * 100);
   if (rounded < 0) {
-    return `Negative(${rounded * -1}% certainty)`;
+    return `Negative (${rounded * -1}% certainty)`;
   } else if (rounded > 0) {
-    return `Positive(${rounded}% certainty)`;
+    return `Positive (${rounded}% certainty)`;
   } else {
     return "Neutral";
   }
