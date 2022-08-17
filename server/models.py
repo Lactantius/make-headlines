@@ -234,11 +234,39 @@ def new_anon_user():
     return User(username=uuid.uuid4(), email=uuid.uuid4(), anonymous=True)
 
 
-def serialize(obj: (Headline | Rewrite)) -> dict[str, (str | float)]:
+def serialize(
+    obj: (Headline | Rewrite), with_rewrites=False, user=None
+) -> dict[str, (str | float)]:
     """Return serialized headline"""
 
     match obj:
         case Headline():
+            if with_rewrites:
+                if user:
+                    return {
+                        "id": obj.id,
+                        "text": obj.text,
+                        "sentiment_score": obj.sentiment_score,
+                        "date": obj.date,
+                        "source_id": obj.source_id,
+                        "source": obj.source.name,
+                        "url": obj.url,
+                        "rewrites": [
+                            serialize(rewrite)
+                            for rewrite in obj.rewrites
+                            if rewrite.user == user
+                        ],
+                    }
+                return {
+                    "id": obj.id,
+                    "text": obj.text,
+                    "sentiment_score": obj.sentiment_score,
+                    "date": obj.date,
+                    "source_id": obj.source_id,
+                    "source": obj.source.name,
+                    "url": obj.url,
+                    "rewrites": [serialize(rewrite) for rewrite in obj.rewrites],
+                }
             return {
                 "id": obj.id,
                 "text": obj.text,

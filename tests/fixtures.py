@@ -19,6 +19,7 @@ from server.models import (
 
 @pytest.fixture(scope="session", autouse=True)
 def set_config_variables() -> Flask:
+    """Set the config variables and return the app"""
     app = create_app()
     app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///headlines_test"
 
@@ -31,6 +32,7 @@ def set_config_variables() -> Flask:
 
 @pytest.fixture
 def client(set_config_variables) -> FlaskClient:
+    """Get client"""
 
     return set_config_variables.test_client()
 

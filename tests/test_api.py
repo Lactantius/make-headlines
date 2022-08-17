@@ -94,11 +94,12 @@ def test_rate_limit_unauthenticated_users(client):
         }
 
 
-# def test_get_all_headlines_for_user(client, user):
-#     """Can a logged in user get all rewrites?"""
+def test_get_all_headlines_for_user(client, user):
+    """Can a logged in user get all rewrites?"""
 
-#     with client:
-#         res = client.get(f"/api/users/{user.id}/rewrites")
+    with client:
+        res = client.get(f"/api/users/{user.id}/rewrites")
+        assert res.json == ""
 
 
 ##############################################################################

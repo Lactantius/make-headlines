@@ -17,10 +17,9 @@ from flask import (
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import DatabaseError, IntegrityError
-import os
 from sqlalchemy.sql import func
 
-from . import db
+from server.forms import RewriteForm, SignupForm, LoginForm
 
 from server.models import (
     authenticate_user,
@@ -34,31 +33,8 @@ from server.models import (
     new_user,
     serialize,
 )
+from . import db
 
-from server.forms import RewriteForm, SignupForm, LoginForm
-
-# from forms import RewriteForm
-
-# app = Flask(__name__)
-
-# From https://help.heroku.com/ZKNTJQSK/why-is-sqlalchemy-1-4-x-not-connecting-to-heroku-postgres
-# uri = os.environ.get("DATABASE_URL", "postgresql:///headlines_dev")
-# if uri and uri.startswith("postgres://"):
-#     uri = uri.replace("postgres://", "postgresql://", 1)
-
-# app.config["SQLALCHEMY_DATABASE_URI"] = uri
-# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-# app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
-# app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET")
-
-# if os.getenv("FLASK_ENV") == "development":
-#     from flask_debugtoolbar import DebugToolbarExtension
-
-#     toolbar = DebugToolbarExtension(app)
-#     app.config["SQLALCHEMY_ECHO"] = True
-
-# connect_db(app)
-# db.create_all()
 
 ##############################################################################
 # Decorators
@@ -105,6 +81,7 @@ def rate_limit(route):
 def get_user(route):
     """Get user from session and pass to route"""
 
+    @wraps(route)
     def wrapper(*args, **kwargs):
         try:
             user = User.query.get(session["user_id"])
@@ -158,18 +135,34 @@ def get_random_headline() -> tuple[Response, int]:
     return (jsonify(headline=serialize(headline)), 200)
 
 
-# @app.get("/api/users/<user_id>/rewrites")
-# @get_user
-# def get_all_rewrites(user_id, user):
-#     """Get all rewrites by a user"""
-#     if user_id == user.id or user.admin:
-#         rewrites = Rewrite.query.filter(Rewrite.user == user).order_by(Headline.date)
-#         return jsonify()
-#     else:
-#         return (
-#             jsonify(error="You must log in to view this information."),
-#             401,
-#         )
+@app.get("/api/users/<user_id>/rewrites")
+@get_user
+def get_all_rewrites(user_id, current_user):
+    """Get all rewrites by a user"""
+    # rewrites = (
+    #     db.session.query(Rewrite, Headline)
+    #     .filter(Rewrite.user == current_user)
+    #     .order_by(Rewrite.headline)
+    #     .all()
+    # )
+    # rewrites = Rewrite.query.filter(Rewrite.user == current_user).all()
+    rewrites = Rewrite.query.filter(Rewrite.user == current_user).all()
+    headlines = set([rewrite.headline for rewrite in rewrites])
+    json_headlines = [
+        serialize(headline, with_rewrites=True, user=current_user)
+        for headline in headlines
+    ]
+
+    # json_rewrites = [serialize(rewrite) for rewrite in rewrites]
+    return json_headlines
+    # return jsonify(rewrites)
+    # if user_id == user.id or user.admin:
+    #     rewrites = Rewrite.query.filter(Rewrite.user == user).order_by(Headline.date)
+    #     return jsonify()
+    # return (
+    #     jsonify(error="You must log in to view this information."),
+    #     401,
+    # )
 
 
 ##############################################################################

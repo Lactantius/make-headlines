@@ -17,6 +17,7 @@ from server.models import (
     new_user,
     new_headline,
     authenticate_user,
+    serialize,
 )
 from server import create_app
 from .fixtures import set_config_variables, seed_database
@@ -81,12 +82,90 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
     assert r.sentiment_score <= 1.0 and r.sentiment_score > 0
     assert r.user.username == "test_user"
     assert r.headline.text == "A great thing happened"
+    assert len(r.headline.rewrites) > 0
     assert Rewrite.query.count() == 2
 
 
 ##############################################################################
-# Fixtures
+# Serialize
 #
+
+
+def test_serialize_headline() -> None:
+    """Are rewrites serialized properly?"""
+
+    headline = Headline.query.filter(Headline.text == "A great thing happened").one()
+    user = User.query.filter(User.username == "test_user").one()
+    serialized_headline = serialize(headline, with_rewrites=True, user=user)
+    cleaned_headline = clean_headline(serialized_headline)
+    assert cleaned_headline == {
+        "id": 999,
+        "source": "Amazing News",
+        "source_id": 999,
+        "url": "",
+        "date": date.today(),
+        "text": "A great thing happened",
+        "sentiment_score": 0.990334689617157,
+        "rewrites": [
+            {
+                "id": 999,
+                "headline_id": 999,
+                "semantic_match": 1.0,
+                "sentiment_match": -1.6764936447143555,
+                "sentiment_score": -0.6861589550971985,
+                "text": "An ok thing happened",
+                "user_id": 999,
+                "timestamp": date.today(),
+            },
+            {
+                "id": 999,
+                "headline_id": 999,
+                "semantic_match": 1.0,
+                "sentiment_match": -0.0008274316787719727,
+                "sentiment_score": 0.989507257938385,
+                "text": "A good thing happened",
+                "user_id": 999,
+                "timestamp": date.today(),
+            },
+        ],
+    }
+
+
+def test_serialize_with_other_user() -> None:
+    """Are rewrites serialized properly?"""
+
+    headline = Headline.query.filter(Headline.text == "A great thing happened").one()
+    user = User.query.filter(User.username == "new_user").one()
+    serialized_headline = serialize(headline, with_rewrites=True, user=user)
+    cleaned_headline = clean_headline(serialized_headline)
+    assert cleaned_headline == {
+        "id": 999,
+        "source": "Amazing News",
+        "source_id": 999,
+        "url": "",
+        "date": date.today(),
+        "text": "A great thing happened",
+        "sentiment_score": 0.990334689617157,
+        "rewrites": [],
+    }
+
+
+##############################################################################
+# Fixtures and helpers
+#
+def clean_headline(headline: dict):
+    """Make all non-deterministic values deterministic"""
+
+    cleaned = headline.copy()
+    cleaned["id"] = 999
+    cleaned["source_id"] = 999
+    for rewrite in cleaned["rewrites"]:
+        rewrite["id"] = 999
+        rewrite["headline_id"] = 999
+        rewrite["timestamp"] = date.today()
+        rewrite["user_id"] = 999
+
+    return cleaned
 
 
 @pytest.fixture
