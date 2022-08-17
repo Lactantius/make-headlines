@@ -181,8 +181,13 @@ def index(current_user=None):
 
 
 @app.route("/signup", methods=["GET", "POST"])
-def signup_page():
+@get_user
+def signup_page(current_user):
     """Sign up user"""
+
+    if current_user and not current_user.anonymous:
+        flash("You are already logged in.", "danger")
+        return redirect("/")
 
     form = SignupForm()
     if form.validate_on_submit():
@@ -202,12 +207,17 @@ def signup_page():
         flash("Thanks for signing up.", "success")
         return redirect("/")
 
-    return render_template("signup.html", form=form)
+    return render_template("signup.html", form=form, user=current_user)
 
 
 @app.route("/login", methods=["GET", "POST"])
-def login_page():
+@get_user
+def login_page(current_user):
     """Login user"""
+
+    if current_user and not current_user.anonymous:
+        flash("You are already logged in.", "danger")
+        return redirect("/")
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -222,7 +232,7 @@ def login_page():
             flash("Invalid username or password.", "danger")
             return redirect("/login")
 
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, user=current_user)
 
 
 @app.post("/logout")
