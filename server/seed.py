@@ -1,3 +1,5 @@
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
 from server.models import User, Headline, Rewrite, Source
 from server import db, create_app
 from server.feeds import send_to_database
@@ -22,9 +24,10 @@ def add_sources():
 
 
 def add_headlines():
-    nytimes = Source.query.filter(Source.name == "New York Times").one()
-    print("Adding to database")
-    send_to_database(nytimes)
+    with create_app().app_context():
+        nytimes = Source.query.filter(Source.name == "New York Times").one()
+        print("Adding to database")
+        send_to_database(nytimes)
 
 
 def seed():
@@ -36,6 +39,16 @@ def seed():
         add_headlines()
 
 
+def test_scheduler():
+    print("Do stuff")
+
+
 if __name__ == "__main__":
 
     seed()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=test_scheduler, trigger="interval", seconds=5)
+scheduler.start()
+
+atexit.register(lambda: scheduler.shutdown())

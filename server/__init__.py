@@ -4,6 +4,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 
+# from .seed import seed
+
 # from flask_migrate import Migrate
 # from . import routes, models
 
@@ -41,5 +43,11 @@ def create_app():
         # Should be taken care of by migrate
         # Create tables for our models
         db.create_all()
+
+        # scheduler = BackgroundScheduler()
+        # scheduler.add_job(func=test_scheduler, trigger="interval", seconds=60)
+        # scheduler.start()
+
+        # atexit.register(lambda: scheduler.shutdown())
 
         return app

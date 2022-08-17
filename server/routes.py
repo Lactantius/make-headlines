@@ -19,6 +19,10 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import DatabaseError, IntegrityError
 from sqlalchemy.sql import func
 
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from server.seed import add_headlines
 from server.forms import RewriteForm, SignupForm, LoginForm
 
 from server.models import (
@@ -35,8 +39,17 @@ from server.models import (
     Failure,
     safe_commit,
 )
-from . import db
 
+
+def test_scheduler():
+    print("Do stuff")
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=add_headlines, trigger="interval", seconds=5)
+scheduler.start()
+
+atexit.register(lambda: scheduler.shutdown())
 
 ##############################################################################
 # Decorators
