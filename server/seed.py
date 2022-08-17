@@ -26,8 +26,10 @@ def add_sources():
 def add_headlines():
     with create_app().app_context():
         nytimes = Source.query.filter(Source.name == "New York Times").one()
+        wsj = Source.query.filter(Source.name == "Wall Street Journal").one()
         # print("Adding to database")
         send_to_database(nytimes)
+        send_to_database(wsj)
 
 
 def seed():
