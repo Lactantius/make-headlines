@@ -1,4 +1,5 @@
 -f https://download.pytorch.org/whl/torch_stable.html
+APScheduler==3.9.1
 attrs==22.1.0
 bcrypt==3.2.2
 beautifulsoup4==4.11.1
@@ -58,6 +59,8 @@ pyparsing==3.0.9
 PySocks==1.7.1
 pytest==7.1.2
 python-dateutil==2.8.2
+pytz==2022.2.1
+pytz-deprecation-shim==0.1.0.post0
 PyYAML==6.0
 regex==2022.7.25
 requests==2.28.1
@@ -77,6 +80,8 @@ tomli==2.0.1
 torch==1.12.1+cpu # Would be nice to remove +cpu reduces package size considerably
 tqdm==4.64.0
 transformers==4.21.1
+tzdata==2022.2
+tzlocal==4.2
 typing_extensions==4.3.0
 urllib3==1.26.11
 wcwidth==0.2.5

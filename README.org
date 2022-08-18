@@ -15,11 +15,15 @@ Rewrite headlines from news organizations to change the positive/negative sentim
 - [ ] Flair pulls in dozens of dependencies, most of the unnecessary. Remove them from production, if possible
 - [ ] Calculate semantic match
 - [ ] Test frontend (Cypress?)
-- [ ] Regularly re-run seed headlines function
+- [x] Regularly re-run seed headlines function
 - [ ] Let user see all rewrites
 - [ ] Password reset
-- [ ] User validations
+- [x] User validations
 - [ ] More news sources
-- [ ] About page
+- [x] About page
 - [ ] Default main page to only showing today's headlines
 - [ ] Handle failed request to /api/rewrites gracefully on the frontend
+- [ ] Clean up code (remove unused imports, commented code, etc)
+- [ ] Remove all implicit any from typescript
+- [ ] Implement better view for showing that a request failed
+- [ ] Add alternative login systems (Google, Github, crypto, etc)
