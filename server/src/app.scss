@@ -1,4 +1,5 @@
 $button-color: #2288ff;
+$mobile: 950px;
 
 :root {
   font-size: 62.5%;
@@ -49,8 +50,9 @@ button {
 
     h2 {
       display: flex;
+      flex-direction: column;
+      row-gap: 1.5rem;
       align-items: center;
-      gap: 1rem;
       margin-bottom: 0.5rem;
     }
 
@@ -166,5 +168,24 @@ p {
   .danger {
     color: #bb0000;
     background-color: rgba(255, 0, 0, 0.1);
+  }
+}
+
+@media screen and (max-width: $mobile) {
+  main {
+    margin: 2rem;
+  }
+  .explainer {
+    width: 100%;
+  }
+
+  .rewrite-container {
+    form {
+      flex-direction: column;
+      row-gap: 1.5rem;
+      button {
+        width: 100%;
+      }
+    }
   }
 }
