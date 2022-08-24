@@ -236,3 +236,10 @@ def logout():
 
     flash("Logged out successfully", "success")
     return redirect("/")
+
+
+@app.get("/rewrites")
+@get_user
+def all_rewrites(current_user):
+
+    return render_template("all_rewrites.html", user=current_user)

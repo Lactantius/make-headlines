@@ -202,3 +202,13 @@ def test_logout(client: FlaskClient, user: User) -> None:
         assert res.status_code == 200
         assert b"Logged out successfully" in res.data
         assert "user_id" not in session
+
+
+def test_old_rewrites_page(client: FlaskClient, user: User) -> None:
+    """Can a user see previous rewrites?"""
+
+    with client:
+        res = client.get("/rewrites")
+
+        assert res.status_code == 200
+        assert b"Your Previous Rewrites" in res.data
