@@ -133,10 +133,16 @@ def get_random_headline() -> tuple[Response, int]:
     return (jsonify(headline=serialize(headline)), 200)
 
 
-@app.get("/api/users/<user_id>/rewrites")
+@app.get("/api/users/<uuid:user_id>/rewrites")
 @get_user
 def get_all_rewrites(user_id, current_user):
-    """Get all rewrites by a user"""
+    """
+    Get all rewrites by a user
+    TODO This is probably much more inefficient than it could be
+    """
+    if current_user.id != user_id:
+        return (jsonify(error="You do not have access to this resource."), 403)
+
     rewrites = Rewrite.query.filter(Rewrite.user == current_user).all()
     headlines = set([rewrite.headline for rewrite in rewrites])
     json_headlines = [

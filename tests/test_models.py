@@ -34,7 +34,7 @@ def test_new_user(client: FlaskClient, add_user: User) -> None:
     assert u.username == "new_user"
     assert u.hashed_pwd != "PASSWORD"
     assert u.id != None
-    assert User.query.count() == 2
+    assert User.query.count() == 3
 
     etiam = new_user(username="test2", email="email@email.com", pwd="something")
     assert etiam.hashed_pwd != "something"

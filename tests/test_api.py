@@ -95,13 +95,23 @@ def test_rate_limit_unauthenticated_users(client):
         }
 
 
-def test_get_all_headlines_for_user(client, user, freeze_uuids):
+def test_get_all_headlines_for_user(client, user):
     """Can a logged in user get all rewrites?"""
 
     with client:
         res = client.get(f"/api/users/{user.id}/rewrites")
         assert len(res.json) == 1
         assert len(res.json[0]["rewrites"]) == 3
+
+
+def test_cannot_get_rewrites_of_other_user(client, user):
+    """Will a user be prevented from seeing another user's rewrites?"""
+
+    with client:
+        user2 = User.query.filter(User.username == "another_user").one()
+        res = client.get(f"/api/users/{user2.id}/rewrites")
+        assert res.status_code == 403
+        assert res.json == {"error": "You do not have access to this resource."}
 
 
 ##############################################################################
