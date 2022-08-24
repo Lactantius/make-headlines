@@ -65,7 +65,7 @@ def test_new_headline(client: FlaskClient, add_headline: Headline) -> None:
     assert h.text == "A terrible thing happened"
     assert h.sentiment_score >= -1.0 and h.sentiment_score < 0
     assert h.source.name == "Amazing News"
-    assert Headline.query.count() == 2
+    assert Headline.query.count() == 3
 
 
 ##############################################################################
@@ -83,7 +83,7 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
     assert r.user.username == "test_user"
     assert r.headline.text == "A great thing happened"
     assert len(r.headline.rewrites) > 0
-    assert Rewrite.query.count() == 2
+    assert Rewrite.query.count() == 3
 
 
 ##############################################################################
@@ -92,7 +92,10 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
 
 
 def test_serialize_headline() -> None:
-    """Are rewrites serialized properly?"""
+    """
+    Are rewrites serialized properly?
+    TODO Clean this up to not have three full rewrites.
+    """
 
     headline = Headline.query.filter(Headline.text == "A great thing happened").one()
     user = User.query.filter(User.username == "test_user").one()
@@ -114,6 +117,16 @@ def test_serialize_headline() -> None:
                 "sentiment_match": -1.6764936447143555,
                 "sentiment_score": -0.6861589550971985,
                 "text": "An ok thing happened",
+                "user_id": 999,
+                "timestamp": date.today(),
+            },
+            {
+                "id": 999,
+                "headline_id": 999,
+                "semantic_match": 1.0,
+                "sentiment_match": -0.023634910583496094,
+                "sentiment_score": 0.9666997790336609,
+                "text": "An interesting thing happened",
                 "user_id": 999,
                 "timestamp": date.today(),
             },
@@ -164,6 +177,8 @@ def clean_headline(headline: dict):
         rewrite["headline_id"] = 999
         rewrite["timestamp"] = date.today()
         rewrite["user_id"] = 999
+    # if cleaned["rewrites"]:
+    #     cleaned["rewrites"] = cleaned["rewrites"][0]
 
     return cleaned
 

@@ -137,13 +137,6 @@ def get_random_headline() -> tuple[Response, int]:
 @get_user
 def get_all_rewrites(user_id, current_user):
     """Get all rewrites by a user"""
-    # rewrites = (
-    #     db.session.query(Rewrite, Headline)
-    #     .filter(Rewrite.user == current_user)
-    #     .order_by(Rewrite.headline)
-    #     .all()
-    # )
-    # rewrites = Rewrite.query.filter(Rewrite.user == current_user).all()
     rewrites = Rewrite.query.filter(Rewrite.user == current_user).all()
     headlines = set([rewrite.headline for rewrite in rewrites])
     json_headlines = [
@@ -151,16 +144,7 @@ def get_all_rewrites(user_id, current_user):
         for headline in headlines
     ]
 
-    # json_rewrites = [serialize(rewrite) for rewrite in rewrites]
     return json_headlines
-    # return jsonify(rewrites)
-    # if user_id == user.id or user.admin:
-    #     rewrites = Rewrite.query.filter(Rewrite.user == user).order_by(Headline.date)
-    #     return jsonify()
-    # return (
-    #     jsonify(error="You must log in to view this information."),
-    #     401,
-    # )
 
 
 ##############################################################################

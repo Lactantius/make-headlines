@@ -68,14 +68,20 @@ def seed_database(set_config_variables) -> None:
     db.session.add_all([user, source])
     db.session.commit()
 
-    headline = new_headline(
+    headline1 = new_headline(
         text="A great thing happened", date=date.today(), source_id=source.id
     )
-    db.session.add(headline)
+    headline2 = new_headline(
+        text="Another thing happened", date=date.today(), source_id=source.id
+    )
+    db.session.add_all([headline1, headline2])
     db.session.commit()
 
-    rewrite = new_rewrite(
-        text="An ok thing happened", headline=headline, user_id=user.id
+    rewrite1 = new_rewrite(
+        text="An ok thing happened", headline=headline1, user_id=user.id
     )
-    db.session.add(rewrite)
+    rewrite2 = new_rewrite(
+        text="An interesting thing happened", headline=headline1, user_id=user.id
+    )
+    db.session.add_all([rewrite1, rewrite2])
     db.session.commit()
