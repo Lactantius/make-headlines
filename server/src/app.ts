@@ -125,23 +125,24 @@ function sendRewrite(data: RewriteRequest) {
  * Replace headlines
  */
 
-function showHeadline(heading: HTMLHeadingElement) {
-  getHeadline().then((headline) => {
-    const parentAnchor = headlineElement.parentElement as HTMLAnchorElement;
-    heading.innerText = headline.text;
-    heading.dataset.id = headline.id;
-    (heading.parentElement as HTMLAnchorElement).setAttribute(
-      "href",
-      headline.url
-    );
+async function showHeadline(
+  heading: HTMLHeadingElement,
+  headlineData?: Headline
+): Promise<void> {
+  const headline = headlineData || (await getHeadline());
+  heading.innerText = headline.text;
+  heading.dataset.id = headline.id;
+  (heading.parentElement as HTMLAnchorElement).setAttribute(
+    "href",
+    headline.url
+  );
 
-    const source = document.createElement("span");
-    source.classList.add("headline-source");
-    source.innerText = ` Source: ${headline.source} `;
-    heading.append(source);
+  const source = document.createElement("span");
+  source.classList.add("headline-source");
+  source.innerText = ` Source: ${headline.source} `;
+  heading.append(source);
 
-    affectP.innerText = calculateAffect(headline.sentiment_score);
-  });
+  affectP.innerText = calculateAffect(headline.sentiment_score);
 }
 
 function calculateAffect(score: number): string {
@@ -219,11 +220,20 @@ interface Headline {
 }
 
 async function showOldRewrites(): Promise<void> {
+  const hContainer = document.querySelector(
+    "#previous-rewrites-container"
+  ) as HTMLDivElement;
   const headlines: Headline[] = await fetch("/api/users/user_id/rewrites", {
     headers: { "Content-Type": "application/json" },
   })
     .then((data) => data.json())
     .catch((err: Error) => showOldRewritesError(err));
+
+  headlines.forEach((headline) => {
+    const hElement = document.createElement("h2");
+    showHeadline(hElement, headline);
+    hContainer.append(hElement);
+  });
 }
 
 function showOldRewritesError(err: Error): void {
