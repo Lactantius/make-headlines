@@ -4,11 +4,11 @@
  * Get DOM elements
  */
 
-const headlineElement = document.querySelector(
+const mainHeadlineElement = document.querySelector(
   "#original-headline"
 ) as HTMLHeadingElement;
 
-const rewriteContainer = document.querySelector(
+const mainRewriteContainer = document.querySelector(
   "#main-rewrite-container"
 ) as HTMLDivElement;
 const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
@@ -17,7 +17,11 @@ const mainRewriteDisplay = document.querySelector(
   "#rewrite-list"
 ) as HTMLUListElement;
 
-const mainSentimentPar = rewriteContainer.querySelector(
+const mainHeadlineLink = mainRewriteContainer.querySelector(
+  "a"
+) as HTMLAnchorElement;
+
+const mainSentimentPar = mainRewriteContainer.querySelector(
   "p"
 ) as HTMLParagraphElement;
 const switchHeadlineForm = document.querySelector(
@@ -35,7 +39,7 @@ rewriteForm.addEventListener("submit", (evt) => {
   rewriteFormHandler(
     mainRewriteDisplay,
     rewriteFormInput.value,
-    headlineElement.dataset.id as string
+    mainHeadlineElement.dataset.id as string
   );
   rewriteForm.reset();
 });
@@ -43,7 +47,7 @@ rewriteForm.addEventListener("submit", (evt) => {
 switchHeadlineForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
   moveHeadline();
-  showHeadline(headlineElement, mainSentimentPar);
+  showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
 });
 
 /*
@@ -129,15 +133,13 @@ function sendRewrite(data: RewriteRequest) {
 async function showHeadline(
   heading: HTMLHeadingElement,
   sentimentPar: HTMLParagraphElement,
+  container: HTMLAnchorElement,
   headlineData?: Headline
 ): Promise<void> {
   const headline = headlineData || (await getHeadline());
   heading.innerText = headline.text;
   heading.dataset.id = headline.id;
-  (heading.parentElement as HTMLAnchorElement).setAttribute(
-    "href",
-    headline.url
-  );
+  container.setAttribute("href", headline.url);
 
   const source = document.createElement("span");
   source.classList.add("headline-source");
@@ -145,6 +147,8 @@ async function showHeadline(
   heading.append(source);
 
   sentimentPar.innerText = calculateAffect(headline.sentiment_score);
+  container.append(heading);
+  container.append(sentimentPar);
 }
 
 function calculateAffect(score: number): string {
@@ -170,7 +174,7 @@ function moveHeadline() {
     return;
   }
   //(rewriteContainer.querySelector("p") as HTMLParagraphElement).remove();
-  const oldHeadline = rewriteContainer.cloneNode(true) as HTMLDivElement;
+  const oldHeadline = mainRewriteContainer.cloneNode(true) as HTMLDivElement;
   mainRewriteDisplay.replaceChildren("");
   mainRewriteDisplay.style.display = "none";
   /* Remove button to switch the headline */
@@ -222,7 +226,7 @@ interface Headline {
 }
 
 async function showOldRewrites(): Promise<void> {
-  const hContainer = document.querySelector(
+  const allHeadlinesContainer = document.querySelector(
     "#previous-rewrites-container"
   ) as HTMLDivElement;
   const headlines: Headline[] = await fetch(
@@ -234,19 +238,22 @@ async function showOldRewrites(): Promise<void> {
     .then((data) => data.json())
     .catch((err: Error) => showOldRewritesError(err));
 
+  allHeadlinesContainer.replaceChildren("");
   headlines.forEach((headline) => {
+    const hContainer = document.createElement("div");
+    hContainer.classList.add("rewrite-container");
     const link = document.createElement("a");
     const hElement = document.createElement("h2");
     const sentimentPar = document.createElement("p");
-    link.append(hElement);
-    showHeadline(hElement, sentimentPar, headline);
-    hContainer.append(hElement);
+    showHeadline(hElement, sentimentPar, link, headline);
+    hContainer.append(link);
 
     const rewrites = document.createElement("ul");
     (headline.rewrites as Rewrite[]).forEach((rewrite) => {
       showRewrite(rewrite, rewrites);
     });
     hContainer.append(rewrites);
+    allHeadlinesContainer.append(hContainer);
   });
 }
 
@@ -261,7 +268,7 @@ function showOldRewritesError(err: Error): void {
 function main(): void {
   const path = location.pathname;
   if (path === "/") {
-    showHeadline(headlineElement, mainSentimentPar);
+    showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
   } else if (path === "/rewrites") {
     showOldRewrites();
   }

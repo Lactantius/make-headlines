@@ -209,6 +209,10 @@ p {
   }
 }
 
+#previous-rewrites-container {
+  text-align: center;
+}
+
 @media screen and (max-width: $mobile) {
   main {
     margin: 2rem;
