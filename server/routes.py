@@ -1,7 +1,8 @@
 """Routes"""
 
 from functools import wraps
-from uuid import uuid4
+from uuid import uuid4, UUID
+import uuid
 from flask import (
     current_app as app,
     Flask,
@@ -133,14 +134,17 @@ def get_random_headline() -> tuple[Response, int]:
     return (jsonify(headline=serialize(headline)), 200)
 
 
-@app.get("/api/users/<uuid:user_id>/rewrites")
+@app.get("/api/users/<string:user_id>/rewrites")
 @get_user
-def get_all_rewrites(user_id, current_user):
+def get_all_rewrites(user_id: str, current_user: User) -> tuple | list:
     """
     Get all rewrites by a user
+    It might be better to always demand a real user id, but then
+    the frontend would need to get that somehow, which would slow things down.
     TODO This is probably much more inefficient than it could be
     """
-    if current_user.id != user_id:
+
+    if user_id != "logged_in_user" and current_user.id != uuid.UUID(user_id):
         return (jsonify(error="You do not have access to this resource."), 403)
 
     rewrites = Rewrite.query.filter(Rewrite.user == current_user).all()

@@ -100,6 +100,7 @@ def test_get_all_headlines_for_user(client, user):
 
     with client:
         res = client.get(f"/api/users/{user.id}/rewrites")
+        assert res.status_code == 200
         assert len(res.json) == 1
         assert len(res.json[0]["rewrites"]) == 3
 

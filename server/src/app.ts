@@ -223,9 +223,12 @@ async function showOldRewrites(): Promise<void> {
   const hContainer = document.querySelector(
     "#previous-rewrites-container"
   ) as HTMLDivElement;
-  const headlines: Headline[] = await fetch("/api/users/user_id/rewrites", {
-    headers: { "Content-Type": "application/json" },
-  })
+  const headlines: Headline[] = await fetch(
+    "/api/users/logged_in_user/rewrites",
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  )
     .then((data) => data.json())
     .catch((err: Error) => showOldRewritesError(err));
 
