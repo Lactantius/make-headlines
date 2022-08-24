@@ -9,8 +9,10 @@ $form-font-size: 2.5rem;
 body {
   font-family: "Open Sans", sans-serif;
   font-size: 1.5rem;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   margin: 0;
+  min-height: 100vh;
 }
 
 h1,
@@ -110,13 +112,16 @@ button {
   }
 }
 
-nav {
+nav,
+footer {
   display: flex;
   gap: 2rem;
+  align-items: center;
   color: white;
   font-size: 2rem;
   background-color: black;
   padding: 1rem;
+  height: 3rem;
   a {
     color: white;
     text-decoration: none;
@@ -128,6 +133,14 @@ nav {
   .push {
     margin-left: auto;
   }
+}
+
+nav {
+  margin-top: 0;
+}
+
+footer {
+  margin-top: auto;
 }
 
 .user-form {
