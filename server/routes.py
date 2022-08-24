@@ -247,3 +247,16 @@ def logout():
 def all_rewrites(current_user):
 
     return render_template("all_rewrites.html", user=current_user)
+
+
+##############################################################################
+# Error Handling
+#
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+
+    # Cannot use the @get_user decorator here
+    user = Failure(session.get("user_id")).bind(User.query.get)
+    return render_template("404.html", user=user), 404
