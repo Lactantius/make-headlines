@@ -1,54 +1,42 @@
 "use strict";
 
-/*
- * Get DOM elements
- */
-
-const mainHeadlineElement = document.querySelector(
-  "#original-headline"
-) as HTMLHeadingElement;
-
-const mainRewriteContainer = document.querySelector(
-  "#main-rewrite-container"
-) as HTMLDivElement;
-const rewriteForm = document.querySelector("#rewrite-form") as HTMLFormElement;
-const rewriteFormInput = rewriteForm.querySelector("#text") as HTMLInputElement;
-const mainRewriteDisplay = document.querySelector(
-  "#rewrite-list"
-) as HTMLUListElement;
-
-const mainHeadlineLink = mainRewriteContainer.querySelector(
-  "a"
-) as HTMLAnchorElement;
-
-const mainSentimentPar = mainRewriteContainer.querySelector(
-  "p"
-) as HTMLParagraphElement;
-const switchHeadlineForm = document.querySelector(
-  "#switch-headline"
-) as HTMLFormElement;
-
-const oldRewrites = document.querySelector("#old-rewrites") as HTMLDivElement;
+main();
 
 /*
  * Event Listeners
  */
 
-rewriteForm.addEventListener("submit", (evt) => {
-  evt.preventDefault();
-  rewriteFormHandler(
-    mainRewriteDisplay,
-    rewriteFormInput.value,
-    mainHeadlineElement.dataset.id as string
-  );
-  rewriteForm.reset();
-});
+function addIndexPageListeners(
+  rewriteForm: HTMLFormElement,
+  mainRewriteDisplay: HTMLUListElement,
+  mainRewriteContainer: HTMLDivElement,
+  rewriteFormInput: HTMLInputElement,
+  mainHeadlineElement: HTMLHeadingElement,
+  switchHeadlineForm: HTMLFormElement,
+  mainSentimentPar: HTMLParagraphElement,
+  mainHeadlineLink: HTMLAnchorElement,
+  oldRewritesContainer: HTMLDivElement
+): void {
+  rewriteForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    rewriteFormHandler(
+      mainRewriteDisplay,
+      rewriteFormInput.value,
+      mainHeadlineElement.dataset.id as string
+    );
+    rewriteForm.reset();
+  });
 
-switchHeadlineForm.addEventListener("submit", (evt) => {
-  evt.preventDefault();
-  moveHeadline();
-  showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
-});
+  switchHeadlineForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+    moveHeadline(
+      mainRewriteDisplay,
+      mainRewriteContainer,
+      oldRewritesContainer
+    );
+    showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
+  });
+}
 
 /*
  * Main Form Functions
@@ -115,7 +103,6 @@ function calculateScore(match: number): number {
 }
 
 function sendRewrite(data: RewriteRequest) {
-  console.log(data);
   return fetch("/api/rewrites", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -169,7 +156,11 @@ function getHeadline() {
     .catch((err) => err);
 }
 
-function moveHeadline() {
+function moveHeadline(
+  mainRewriteDisplay: HTMLUListElement,
+  mainRewriteContainer: HTMLDivElement,
+  oldRewritesContainer: HTMLDivElement
+) {
   if (mainRewriteDisplay.children.length === 0) {
     return;
   }
@@ -199,7 +190,7 @@ function moveHeadline() {
     document.querySelector("#previous-headlines") as HTMLHeadingElement
   ).style.display = "block";
 
-  oldRewrites.prepend(oldHeadline);
+  oldRewritesContainer.prepend(oldHeadline);
 }
 
 function removeIds(node: Element): void {
@@ -268,10 +259,55 @@ function showOldRewritesError(err: Error): void {
 function main(): void {
   const path = location.pathname;
   if (path === "/") {
+    const mainHeadlineElement = document.querySelector(
+      "#original-headline"
+    ) as HTMLHeadingElement;
+
+    const rewriteForm = document.querySelector(
+      "#rewrite-form"
+    ) as HTMLFormElement;
+
+    const rewriteFormInput = rewriteForm.querySelector(
+      "#text"
+    ) as HTMLInputElement;
+
+    const mainRewriteContainer = document.querySelector(
+      "#main-rewrite-container"
+    ) as HTMLDivElement;
+
+    const mainRewriteDisplay = document.querySelector(
+      "#rewrite-list"
+    ) as HTMLUListElement;
+
+    const switchHeadlineForm = document.querySelector(
+      "#switch-headline"
+    ) as HTMLFormElement;
+
+    const mainHeadlineLink = mainRewriteContainer.querySelector(
+      "a"
+    ) as HTMLAnchorElement;
+
+    const mainSentimentPar = mainRewriteContainer.querySelector(
+      "p"
+    ) as HTMLParagraphElement;
+
+    const oldRewritesContainer = document.querySelector(
+      "#old-rewrites"
+    ) as HTMLDivElement;
+
     showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
+    addIndexPageListeners(
+      rewriteForm,
+      mainRewriteDisplay,
+      mainRewriteContainer,
+      rewriteFormInput,
+      mainHeadlineElement,
+      switchHeadlineForm,
+      mainSentimentPar,
+      mainHeadlineLink,
+      oldRewritesContainer
+    );
   } else if (path === "/rewrites") {
     showOldRewrites();
   }
 }
-
-main();
