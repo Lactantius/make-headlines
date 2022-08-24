@@ -115,16 +115,20 @@ button {
 nav,
 footer {
   display: flex;
-  gap: 2rem;
+  gap: 4rem;
   align-items: center;
   color: white;
   font-size: 2rem;
   background-color: black;
   padding: 1rem;
-  height: 3rem;
-  a {
+  height: 4rem;
+  a,
+  button {
     color: white;
     text-decoration: none;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
   }
   button {
     padding: 0;
@@ -133,20 +137,34 @@ footer {
   .push {
     margin-left: auto;
   }
+  svg {
+    height: 2rem;
+    fill: white;
+  }
 }
 
 nav {
   margin-top: 0;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  .header-logo {
+    font-family: "Oswald", sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 150%;
+  }
 }
 
 footer {
   margin-top: auto;
+  justify-content: center;
 }
 
 .user-form {
   display: grid;
   width: 50rem;
   justify-self: center;
+  margin: auto;
   input {
     margin-bottom: 2rem;
   }
