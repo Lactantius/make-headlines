@@ -41,7 +41,7 @@ rewriteForm.addEventListener("submit", (evt) => {
 switchHeadlineForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
   moveHeadline();
-  replaceHeadline();
+  showHeadline(headlineElement);
 });
 
 /*
@@ -125,12 +125,12 @@ function sendRewrite(data: RewriteRequest) {
  * Replace headlines
  */
 
-function replaceHeadline() {
+function showHeadline(heading: HTMLHeadingElement) {
   getHeadline().then((headline) => {
     const parentAnchor = headlineElement.parentElement as HTMLAnchorElement;
-    headlineElement.innerText = headline.text;
-    headlineElement.dataset.id = headline.id;
-    (headlineElement.parentElement as HTMLAnchorElement).setAttribute(
+    heading.innerText = headline.text;
+    heading.dataset.id = headline.id;
+    (heading.parentElement as HTMLAnchorElement).setAttribute(
       "href",
       headline.url
     );
@@ -138,7 +138,7 @@ function replaceHeadline() {
     const source = document.createElement("span");
     source.classList.add("headline-source");
     source.innerText = ` Source: ${headline.source} `;
-    headlineElement.append(source);
+    heading.append(source);
 
     affectP.innerText = calculateAffect(headline.sentiment_score);
   });
@@ -204,7 +204,43 @@ function removeIds(node: Element): void {
 }
 
 /*
+ * Rewrites Page: Functions for getting and displaying all of a user's old rewrites
+ */
+
+interface Headline {
+  id: string;
+  text: string;
+  sentiment_score: number;
+  date: string;
+  source_id: string;
+  source: string;
+  url: string;
+  rewrites?: Rewrite[];
+}
+
+async function showOldRewrites(): Promise<void> {
+  const headlines: Headline[] = await fetch("/api/users/user_id/rewrites", {
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((data) => data.json())
+    .catch((err: Error) => showOldRewritesError(err));
+}
+
+function showOldRewritesError(err: Error): void {
+  alert(err);
+}
+
+/*
  * Initialize
  */
 
-replaceHeadline();
+function main(): void {
+  const path = location.pathname;
+  if (path === "/") {
+    showHeadline(headlineElement);
+  } else if (path === "/rewrites") {
+    showOldRewrites();
+  }
+}
+
+main();

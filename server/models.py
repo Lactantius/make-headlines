@@ -187,20 +187,6 @@ def new_rewrite(text: str, headline: Headline, user_id: UUID) -> Rewrite:
     )
 
 
-# def serialize_rewrite(rewrite: Rewrite) -> dict[str, (str | float)]:
-#     """Return serialized rewrite"""
-
-#     return {
-#         "id": obj.id,
-#         "text": obj.text,
-#         "sentiment_score": obj.sentiment_score,
-#         "semantic_match": obj.semantic_match,
-#         "user_id": obj.user_id,
-#         "headline_id": obj.headline_id,
-#         "timestamp": obj.timestamp,
-#     }
-
-
 def calc_semantic_match(rewrite: str, headline: str) -> float:
     """TODO Use Gensim"""
 
