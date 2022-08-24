@@ -17,7 +17,9 @@ const mainRewriteDisplay = document.querySelector(
   "#rewrite-list"
 ) as HTMLUListElement;
 
-const affectP = rewriteContainer.querySelector("p") as HTMLParagraphElement;
+const mainSentimentPar = rewriteContainer.querySelector(
+  "p"
+) as HTMLParagraphElement;
 const switchHeadlineForm = document.querySelector(
   "#switch-headline"
 ) as HTMLFormElement;
@@ -41,7 +43,7 @@ rewriteForm.addEventListener("submit", (evt) => {
 switchHeadlineForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
   moveHeadline();
-  showHeadline(headlineElement);
+  showHeadline(headlineElement, mainSentimentPar);
 });
 
 /*
@@ -127,6 +129,7 @@ function sendRewrite(data: RewriteRequest) {
 
 async function showHeadline(
   heading: HTMLHeadingElement,
+  sentimentPar: HTMLParagraphElement,
   headlineData?: Headline
 ): Promise<void> {
   const headline = headlineData || (await getHeadline());
@@ -142,7 +145,7 @@ async function showHeadline(
   source.innerText = ` Source: ${headline.source} `;
   heading.append(source);
 
-  affectP.innerText = calculateAffect(headline.sentiment_score);
+  sentimentPar.innerText = calculateAffect(headline.sentiment_score);
 }
 
 function calculateAffect(score: number): string {
@@ -233,8 +236,11 @@ async function showOldRewrites(): Promise<void> {
     .catch((err: Error) => showOldRewritesError(err));
 
   headlines.forEach((headline) => {
+    const link = document.createElement("a");
     const hElement = document.createElement("h2");
-    showHeadline(hElement, headline);
+    const sentimentPar = document.createElement("p");
+    link.append(hElement);
+    showHeadline(hElement, sentimentPar, headline);
     hContainer.append(hElement);
   });
 }
@@ -250,7 +256,7 @@ function showOldRewritesError(err: Error): void {
 function main(): void {
   const path = location.pathname;
   if (path === "/") {
-    showHeadline(headlineElement);
+    showHeadline(headlineElement, mainSentimentPar);
   } else if (path === "/rewrites") {
     showOldRewrites();
   }
