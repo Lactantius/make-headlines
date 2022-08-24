@@ -55,7 +55,7 @@ interface RewriteRequest {
   headline_id: string;
 }
 
-function rewriteFormHandler(
+async function rewriteFormHandler(
   rewriteList: HTMLUListElement,
   text: string,
   headlineId: string
@@ -64,47 +64,46 @@ function rewriteFormHandler(
     text: text,
     headline_id: headlineId,
   };
-  const rewrite: Promise<Rewrite> = sendRewrite(requestBody);
-  displayRewrite(rewrite, rewriteList);
+  const rewrite: Rewrite = await sendRewrite(requestBody);
+  showRewrite(rewrite, rewriteList);
+}
+
+interface RewriteResponse {
+  rewrite: Rewrite;
 }
 
 interface Rewrite {
-  rewrite: {
-    id: string;
-    headline_id: string;
-    user_id: string;
-    text: string;
-    timestamp: string;
-    semantic_score: number;
-    sentiment_match: number;
-    semantic_match: number;
-    sentiment_score: number;
-  };
+  id: string;
+  headline_id: string;
+  user_id: string;
+  text: string;
+  timestamp: string;
+  semantic_score: number;
+  sentiment_match: number;
+  semantic_match: number;
+  sentiment_score: number;
 }
 
 interface Error {
   error: string;
 }
 
-function displayRewrite(
-  rewrite: Promise<Rewrite | Error>,
+function showRewrite(
+  rewrite: Rewrite | RewriteResponse,
   rewriteList: HTMLUListElement
 ): void {
   const li = document.createElement("li");
 
-  rewrite.then((r) => (li.innerText = formatRewrite(r)));
+  li.innerText =
+    "rewrite" in rewrite
+      ? formatRewrite(rewrite.rewrite)
+      : formatRewrite(rewrite);
   rewriteList.prepend(li);
   rewriteList.style.display = "block";
 }
 
-function formatRewrite(data: Rewrite | Error): string {
-  if ("rewrite" in data) {
-    return `${data.rewrite.text} | Score: ${calculateScore(
-      data.rewrite.sentiment_match
-    )}`;
-  } else {
-    return data.error;
-  }
+function formatRewrite(data: Rewrite): string {
+  return `${data.text} | Score: ${calculateScore(data.sentiment_match)}`;
 }
 
 function calculateScore(match: number): number {
@@ -242,6 +241,12 @@ async function showOldRewrites(): Promise<void> {
     link.append(hElement);
     showHeadline(hElement, sentimentPar, headline);
     hContainer.append(hElement);
+
+    const rewrites = document.createElement("ul");
+    (headline.rewrites as Rewrite[]).forEach((rewrite) => {
+      showRewrite(rewrite, rewrites);
+    });
+    hContainer.append(rewrites);
   });
 }
 
