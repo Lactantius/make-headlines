@@ -48,6 +48,18 @@ class SignupForm(FlaskForm):
 
     password = PasswordField(
         "Password",
-        validators=[InputRequired()],
+        validators=[InputRequired(), Length(min=10)],
         render_kw={"placeholder": "Enter a password"},
     )
+
+
+class ProfileEditForm(FlaskForm):
+    """Form for signing up"""
+
+    username = StringField(
+        "Username", validators=[InputRequired(), Length(min=3, max=50)]
+    )
+
+    email = EmailField("Email", validators=[InputRequired()])
+
+    confirm_password = PasswordField("Confirm Password", validators=[InputRequired()])

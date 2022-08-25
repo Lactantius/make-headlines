@@ -16,15 +16,6 @@ from server.analysis import calc_sentiment_score
 bcrypt = Bcrypt()
 from . import db
 
-# db = SQLAlchemy()
-
-
-# def connect_db(app):
-#     """Connect to database"""
-
-#     db.app = app
-#     db.init_app(app)
-
 
 ##############################################################################
 # User
@@ -214,9 +205,10 @@ def new_user(username: str, email: str, pwd: str) -> User:
     )
 
 
-def safe_commit(obj: object) -> tuple[str, object]:
+def safe_commit(obj: object | None) -> tuple[str, object]:
     # return Failure(obj).bind(db.session.add).bind(db.session.commit)
-    db.session.add(obj)
+    if obj:
+        db.session.add(obj)
     try:
         db.session.commit()
     except IntegrityError:

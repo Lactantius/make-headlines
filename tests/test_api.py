@@ -1,6 +1,6 @@
 """Test API endpoints"""
 
-from flask import session
+from flask import request, session
 from flask.testing import FlaskClient
 from server import create_app
 from server.models import Headline, Rewrite, User
@@ -186,7 +186,7 @@ def test_signup(client: FlaskClient) -> None:
             data={
                 "username": "test_signup",
                 "email": "test@signup.com",
-                "password": "PASSWORD",
+                "password": "LONGERPASSWORD",
             },
             follow_redirects=True,
         )
@@ -213,3 +213,23 @@ def test_old_rewrites_page(client: FlaskClient, user: User) -> None:
 
         assert res.status_code == 200
         assert b"Your Previous Rewrites" in res.data
+
+
+def test_profile_page(client: FlaskClient, user: User) -> None:
+    """Can a user get to the profile page?"""
+
+    with client:
+        res = client.get("/profile")
+
+        assert res.status_code == 200
+        assert b"Profile" in res.data
+
+
+def test_anon_cannot_access_profile_page(client: FlaskClient) -> None:
+    """Will a user who is not logged in be prevented from seeing the profile page?"""
+
+    with client:
+        res = client.get("/profile", follow_redirects=True)
+
+        assert res.status_code == 200
+        assert b"You do not have access" in res.data

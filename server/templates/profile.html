@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<h1>Profile</h1>
+<form id="profile-form" action="/profile" method="POST" class="user-form">
+    {{ form.hidden_tag() }}
+
+    {% for field in form if field.widget.input_type != "hidden" %}
+
+    {{ field.label }}
+    {{ field }}
+
+    {% endfor %}
+    <button>Edit Profile</button>
+</form>
+{% endblock %}

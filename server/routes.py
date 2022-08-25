@@ -22,7 +22,7 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from server.seed import add_headlines
-from server.forms import RewriteForm, SignupForm, LoginForm
+from server.forms import RewriteForm, SignupForm, LoginForm, ProfileEditForm
 
 from server.models import (
     authenticate_user,
@@ -247,6 +247,45 @@ def logout():
 def all_rewrites(current_user):
 
     return render_template("all_rewrites.html", user=current_user)
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@get_user
+def profile_page(current_user):
+    """
+    Profile
+    TODO Make this code less embarrassing
+    """
+
+    if (not current_user) or current_user.anonymous:
+        flash("You do not have access to this page.", "danger")
+        return redirect("/")
+
+    form = ProfileEditForm(obj=current_user)
+    if form.validate_on_submit():
+
+        authenticated = authenticate_user(
+            current_user.username, form.confirm_password.data
+        )
+
+        if authenticated:
+
+            form.populate_obj(current_user)
+            msg = safe_commit(None)[0]
+
+            if msg == "success":
+                flash(f"Profile edited successfully.", "success")
+                return redirect("/profile")
+
+            else:
+                flash("Incorrect form data", "danger")
+                return redirect("/profile")
+
+        else:
+            flash("Invalid password.", "danger")
+            return redirect("/profile")
+
+    return render_template("profile.html", form=form, user=current_user)
 
 
 ##############################################################################
