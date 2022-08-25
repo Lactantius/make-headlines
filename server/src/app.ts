@@ -300,57 +300,63 @@ function makeCloseButton(parent: HTMLElement): HTMLButtonElement {
  * Main
  */
 
+function setupIndexPage(): void {
+  const mainHeadlineElement = document.querySelector(
+    "#original-headline"
+  ) as HTMLHeadingElement;
+
+  const rewriteForm = document.querySelector(
+    "#rewrite-form"
+  ) as HTMLFormElement;
+
+  const rewriteFormInput = rewriteForm.querySelector(
+    "#text"
+  ) as HTMLInputElement;
+
+  const mainRewriteContainer = document.querySelector(
+    "#main-rewrite-container"
+  ) as HTMLDivElement;
+
+  const mainRewriteDisplay = document.querySelector(
+    "#rewrite-list"
+  ) as HTMLUListElement;
+
+  const switchHeadlineForm = document.querySelector(
+    "#switch-headline"
+  ) as HTMLFormElement;
+
+  const mainHeadlineLink = mainRewriteContainer.querySelector(
+    "a"
+  ) as HTMLAnchorElement;
+
+  const mainSentimentPar = mainRewriteContainer.querySelector(
+    "p"
+  ) as HTMLParagraphElement;
+
+  const oldRewritesContainer = document.querySelector(
+    "#old-rewrites"
+  ) as HTMLDivElement;
+
+  (rewriteForm.querySelector("#text") as HTMLInputElement).focus();
+
+  showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
+  addIndexPageListeners(
+    rewriteForm,
+    mainRewriteDisplay,
+    mainRewriteContainer,
+    rewriteFormInput,
+    mainHeadlineElement,
+    switchHeadlineForm,
+    mainSentimentPar,
+    mainHeadlineLink,
+    oldRewritesContainer
+  );
+}
+
 function main(): void {
   const path = location.pathname;
   if (path === "/") {
-    const mainHeadlineElement = document.querySelector(
-      "#original-headline"
-    ) as HTMLHeadingElement;
-
-    const rewriteForm = document.querySelector(
-      "#rewrite-form"
-    ) as HTMLFormElement;
-
-    const rewriteFormInput = rewriteForm.querySelector(
-      "#text"
-    ) as HTMLInputElement;
-
-    const mainRewriteContainer = document.querySelector(
-      "#main-rewrite-container"
-    ) as HTMLDivElement;
-
-    const mainRewriteDisplay = document.querySelector(
-      "#rewrite-list"
-    ) as HTMLUListElement;
-
-    const switchHeadlineForm = document.querySelector(
-      "#switch-headline"
-    ) as HTMLFormElement;
-
-    const mainHeadlineLink = mainRewriteContainer.querySelector(
-      "a"
-    ) as HTMLAnchorElement;
-
-    const mainSentimentPar = mainRewriteContainer.querySelector(
-      "p"
-    ) as HTMLParagraphElement;
-
-    const oldRewritesContainer = document.querySelector(
-      "#old-rewrites"
-    ) as HTMLDivElement;
-
-    showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
-    addIndexPageListeners(
-      rewriteForm,
-      mainRewriteDisplay,
-      mainRewriteContainer,
-      rewriteFormInput,
-      mainHeadlineElement,
-      switchHeadlineForm,
-      mainSentimentPar,
-      mainHeadlineLink,
-      oldRewritesContainer
-    );
+    setupIndexPage();
   } else if (path === "/rewrites") {
     showOldRewrites();
   }
