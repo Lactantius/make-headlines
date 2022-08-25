@@ -51,13 +51,15 @@ async function rewriteFormHandler(
   rewriteList: HTMLUListElement,
   text: string,
   headlineId: string
-) {
+): Promise<void> {
   const requestBody: RewriteRequest = {
     text: text,
     headline_id: headlineId,
   };
-  const rewrite: Rewrite = await sendRewrite(requestBody);
-  showRewrite(rewrite, rewriteList);
+  const rewrite = await sendRewrite(requestBody);
+  "error" in rewrite
+    ? showLoginPrompt(rewrite.error, rewriteList)
+    : showRewrite(rewrite, rewriteList);
 }
 
 interface RewriteResponse {
@@ -76,7 +78,7 @@ interface Rewrite {
   sentiment_score: number;
 }
 
-interface Error {
+interface ErrorResponse {
   error: string;
 }
 
@@ -102,15 +104,17 @@ function calculateScore(match: number): number {
   return Math.round(Math.abs(match) * 100);
 }
 
-function sendRewrite(data: RewriteRequest) {
+function sendRewrite(
+  data: RewriteRequest
+): Promise<RewriteResponse | ErrorResponse> {
   return fetch("/api/rewrites", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   })
     .then((p) => p.json())
-    .then((data) => data)
-    .catch((err) => err);
+    .then((data: RewriteResponse) => data)
+    .catch((err: ErrorResponse) => err);
 }
 
 /*
@@ -253,7 +257,47 @@ function showOldRewritesError(err: Error): void {
 }
 
 /*
- * Initialize
+ * Notifications
+ */
+
+function showLoginPrompt(msg: string, rewriteList: HTMLUListElement): void {
+  const body = document.querySelector("body") as HTMLBodyElement;
+  const prompt = document.createElement("prompt");
+
+  prompt.classList.add("modal");
+  prompt.append(formatErrorMessage(msg));
+
+  const closeButton = makeCloseButton(prompt);
+  prompt.append(closeButton);
+
+  body.append(prompt);
+}
+
+function formatErrorMessage(msg: string): HTMLSpanElement {
+  const span = document.createElement("span");
+  if (msg === "Please login before making additional requests.") {
+    span.innerHTML =
+      'Please&nbsp; <a href="/login">login</a> &nbsp;or&nbsp; <a href="/signup">sign up</a> &nbsp;before making additional requests.';
+  } else {
+    span.innerHTML = msg;
+  }
+  return span;
+}
+
+function makeCloseButton(parent: HTMLElement): HTMLButtonElement {
+  console.log("Making button");
+  const button = document.createElement("button");
+  button.innerText = "X";
+  button.classList.add("close-btn");
+  button.addEventListener("click", (evt: MouseEvent) => {
+    evt.preventDefault();
+    parent.remove();
+  });
+  return button;
+}
+
+/*
+ * Main
  */
 
 function main(): void {

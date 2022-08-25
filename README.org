@@ -22,14 +22,15 @@ Rewrite headlines from news organizations to change the positive/negative sentim
   - [ ] More tests, as always
   - [ ] Flair pulls in dozens of dependencies, most of the unnecessary. Remove them from production, if possible
 - [ ] UX improvements
-  - [ ] Add more description to the user results
+  - [ ] Add more description/style to the user results
   - [x] Make layout responsive
-  - [ ] Handle failed request to /api/rewrites gracefully on the frontend
-  - [ ] Implement better view for showing that a request failed
+  - [x] Handle failed request to /api/rewrites gracefully on the frontend
+  - [x] Implement better view for showing that a request failed
   - [ ] Add cookie notification
   - [ ] Add alternative login systems (Google, Github, crypto, etc)
   - [x] Let user see all rewrites
-  - [ ] Password reset
+  - [ ] Password recovery
+  - [ ] Profile page with edit features
 - [ ] Interesting features
   - [ ] Calculate semantic match
   - [ ] More news sources
