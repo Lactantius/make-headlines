@@ -1,7 +1,7 @@
 $button-color: #2288ff;
 $mobile: 950px;
 $form-font-size: 2.5rem;
-$graph-height: 4rem;
+$graph-height: 8rem;
 $graph-background-color: #aa8;
 
 :root {
@@ -80,7 +80,7 @@ button {
     width: auto;
 
     input {
-      min-width: 40rem;
+      min-width: 60rem;
     }
     * {
       font-size: $form-font-size;
