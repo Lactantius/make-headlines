@@ -7,12 +7,24 @@
 <main>
     <h1>How to Make Headlines</h1>
     <div class="explainer">
-        <p>Headlines want to get your attention. That means they often evoke strong emotions.</p>
         <p>Sometimes it's fun to try to think of ways you could rewrite a headline to change its emotional value.
             With this website, you can <i>quantify</i> your success at doing so (at least in a limited way.)
             Each day it gathers new headlines from various major news sources and scores them with a <a
                 href="https://github.com/flairnlp/flair">sentiment analysis tool</a> using a pre-trained model. In other
             words, it uses an AI to predict whether a human would call the headline positive or negative.</p>
+        <p>These are some example results:<br />
+            <i>China Threatens U.S. over Taiwan Trips</i> (negative, 100%) →<br />
+            <i>China Encourages Restraint
+                in
+                Future
+                Taiwan Trips</i> (negative, 76%) → <br />
+            <i>China Encourages U.S. Officials to Visit Countries That Are
+                Not
+                Taiwan</i> (positive, 82%) → <br />
+            <i>China Celebrates Visits to non-Taiwanese Countries, Encourages
+                Washington to
+                Follow Suit</i> (positive, 100%)
+        </p>
         <p>When you input a sentence, the server scores what you wrote using the same tool, then compares it to the
             original and gives you a score from 0 to 200, where 0 means it has the same emotional value and 200 means it
             is as different as possible.</p>
@@ -23,6 +35,8 @@
             is clearly much <i>more</i> positive than the other, the computer is equally sure they are both positive.
             Also, you can get high scores by writing random
             positive or negative scores. But that's cheating. :-(</p>
+        <p>Also, if the scoring for some headline seems completely wrong, that's probably because the computer isn't
+            very good at scoring headline.</p>
         <p>It's all written in Python (Flask framework) and TypeScript. You can see the source <a
                 href="https://github.com/Lactantius/sentimental-headlines">here</a>.</p>
     </div>
