@@ -100,16 +100,38 @@ async function showRewrite(
   rewrite: Rewrite,
   container: HTMLUListElement
 ): Promise<void> {
+  const rewriteDiv = document.createElement("div");
+  rewriteDiv.classList.add("rewrite-div");
+
   const heading = document.createElement("h2");
   heading.innerText = rewrite.text;
   heading.dataset.id = rewrite.id;
 
-  container.append(heading);
-  container.append(makeSentimentGraph(rewrite.sentiment_score));
-  container.append(
+  const deleteButton = makeDeleteButton(rewrite.id, rewriteDiv);
+
+  rewriteDiv.append(heading);
+  rewriteDiv.append(deleteButton);
+  rewriteDiv.append(makeSentimentGraph(rewrite.sentiment_score));
+  rewriteDiv.append(
     makeDifferenceGraph(rewrite.sentiment_match, rewrite.sentiment_score)
   );
   container.style.display = "block";
+  container.append(rewriteDiv);
+}
+
+function makeDeleteButton(
+  id: string,
+  rewriteContainer: HTMLDivElement
+): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.innerText = "X";
+  button.classList.add("delete-btn");
+  button.addEventListener("click", (evt: MouseEvent) => {
+    evt.preventDefault();
+    fetch(`/api/rewrites/${id}`, { method: "DELETE" });
+    rewriteContainer.remove();
+  });
+  return button;
 }
 
 function formatRewrite(data: Rewrite): string {
