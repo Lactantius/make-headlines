@@ -31,7 +31,7 @@ Rewrite headlines from news organizations to change the positive/negative sentim
   - [x] Let user see all rewrites
   - [ ] Password recovery
   - [x] Profile page with edit features
-  - [ ] Password editing
+  - [x] Password editing
 - [ ] Interesting features
   - [ ] Calculate semantic match
   - [ ] More news sources

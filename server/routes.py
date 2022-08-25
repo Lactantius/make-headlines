@@ -22,7 +22,13 @@ import atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from server.seed import add_headlines
-from server.forms import RewriteForm, SignupForm, LoginForm, ProfileEditForm
+from server.forms import (
+    ChangePasswordForm,
+    RewriteForm,
+    SignupForm,
+    LoginForm,
+    ProfileEditForm,
+)
 
 from server.models import (
     authenticate_user,
@@ -31,6 +37,7 @@ from server.models import (
     Headline,
     Source,
     Rewrite,
+    change_password,
     new_anon_user,
     new_rewrite,
     new_user,
@@ -282,16 +289,18 @@ def profile_page(current_user):
         flash("You do not have access to this page.", "danger")
         return redirect("/")
 
-    form = ProfileEditForm(obj=current_user)
-    if form.validate_on_submit():
+    # Profile Form
+
+    profile_form = ProfileEditForm(obj=current_user)
+    if profile_form.validate_on_submit():
 
         authenticated = authenticate_user(
-            current_user.username, form.confirm_password.data
+            current_user.username, profile_form.confirm_password.data
         )
 
         if authenticated:
 
-            form.populate_obj(current_user)
+            profile_form.populate_obj(current_user)
             msg = safe_commit(None)[0]
 
             if msg == "success":
@@ -306,7 +315,55 @@ def profile_page(current_user):
             flash("Invalid password.", "danger")
             return redirect("/profile")
 
-    return render_template("profile.html", form=form, user=current_user)
+    return render_template(
+        "profile.html",
+        profile_form=profile_form,
+        user=current_user,
+    )
+
+
+@app.route("/password", methods=["GET", "POST"])
+@get_user
+def edit_password_page(current_user):
+    """
+    Password
+    TODO Make this code less embarrassing
+    """
+
+    if (not current_user) or current_user.anonymous:
+        flash("You do not have access to this page.", "danger")
+        return redirect("/")
+
+    # Password Form
+
+    password_form = ChangePasswordForm()
+
+    if password_form.validate_on_submit():
+
+        authenticated = authenticate_user(
+            current_user.username, password_form.current.data
+        )
+
+        if authenticated:
+            msg = change_password(current_user, password_form.new.data)
+
+            if msg == "success":
+                flash(f"Password changed successfully.", "success")
+                return redirect("/password")
+
+            else:
+                flash("Password could not be changed", "danger")
+                return redirect("/password")
+
+        else:
+            flash("Invalid password.", "danger")
+            return redirect("/password")
+
+    return render_template(
+        "password.html",
+        password_form=password_form,
+        user=current_user,
+    )
 
 
 ##############################################################################

@@ -205,6 +205,19 @@ def new_user(username: str, email: str, pwd: str) -> User:
     )
 
 
+def change_password(user: User, new_password: str) -> str:
+    """Change a user's password"""
+
+    hashed_pwd = bcrypt.generate_password_hash(new_password)
+    hashed_utf8 = hashed_pwd.decode("utf8")
+
+    user.hashed_pwd = hashed_utf8
+
+    msg = safe_commit(None)[0]
+
+    return msg
+
+
 def safe_commit(obj: object | None) -> tuple[str, object]:
     # return Failure(obj).bind(db.session.add).bind(db.session.commit)
     if obj:

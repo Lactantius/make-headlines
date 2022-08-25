@@ -251,12 +251,17 @@ footer {
   width: 50rem;
   justify-self: center;
   margin: auto;
+  margin-bottom: 3rem;
   input {
     margin-bottom: 2rem;
   }
   * {
     font-size: $form-font-size;
   }
+}
+
+.form-errors {
+  margin-top: 0.5rem;
 }
 
 p {
