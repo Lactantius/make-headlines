@@ -96,10 +96,13 @@ button {
   ul {
     list-style: none;
     font-size: 2rem;
-    width: 30%;
+    width: 60%;
     background-color: #eee;
     padding: 3rem;
     display: none;
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+    font-weight: 400;
     li {
       margin-top: 1rem;
     }

@@ -93,21 +93,20 @@ async function rewriteFormHandler(
   const rewrite = await sendRewrite(requestBody);
   "error" in rewrite
     ? showLoginPrompt(rewrite.error, rewriteList)
-    : showRewrite(rewrite, rewriteList);
+    : showRewrite(rewrite.rewrite, rewriteList);
 }
 
-function showRewrite(
-  rewrite: Rewrite | RewriteResponse,
-  rewriteList: HTMLUListElement
-): void {
-  const li = document.createElement("li");
+async function showRewrite(
+  rewrite: Rewrite,
+  container: HTMLUListElement
+): Promise<void> {
+  const heading = document.createElement("h2");
+  heading.innerText = rewrite.text;
+  heading.dataset.id = rewrite.id;
 
-  li.innerText =
-    "rewrite" in rewrite
-      ? formatRewrite(rewrite.rewrite)
-      : formatRewrite(rewrite);
-  rewriteList.prepend(li);
-  rewriteList.style.display = "block";
+  container.append(heading);
+  container.append(makeSentimentGraph(rewrite.sentiment_score));
+  container.style.display = "block";
 }
 
 function formatRewrite(data: Rewrite): string {
@@ -149,7 +148,6 @@ async function showHeadline(
   if (sentimentGraph) {
     sentimentGraph.remove();
   }
-  //(container.querySelector(".sentiment-graph") as HTMLDivElement).remove();
 
   const source = document.createElement("span");
   source.classList.add("headline-source");
@@ -286,11 +284,11 @@ async function showOldRewrites(): Promise<void> {
     showHeadline(hElement, link, headline);
     hContainer.append(link);
 
-    const rewrites = document.createElement("ul");
+    const rewritesList = document.createElement("ul");
     (headline.rewrites as Rewrite[]).forEach((rewrite) => {
-      showRewrite(rewrite, rewrites);
+      showRewrite(rewrite, rewritesList);
     });
-    hContainer.append(rewrites);
+    hContainer.append(rewritesList);
     allHeadlinesContainer.append(hContainer);
   });
 }
