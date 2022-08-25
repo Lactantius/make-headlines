@@ -80,7 +80,7 @@ def test_rate_limit_unauthenticated_users(client):
 
     with client:
 
-        for x in range(4):
+        for x in range(11):
             no_user = client.post(
                 "/api/rewrites",
                 json={
@@ -113,6 +113,18 @@ def test_cannot_get_rewrites_of_other_user(client, user):
         res = client.get(f"/api/users/{user2.id}/rewrites")
         assert res.status_code == 403
         assert res.json == {"error": "You do not have access to this resource."}
+
+
+def test_delete_rewrite(client, user):
+    """Can a user delete a rewrite?"""
+
+    with client:
+        current_rewrites = Rewrite.query.count()
+        rewrite = Rewrite.query.filter(Rewrite.text == "An ok thing happened").one()
+        res = client.delete(f"/api/rewrites/{rewrite.id}")
+        assert res.status_code == 200
+        assert res.json == {"success": "Rewrite deleted."}
+        assert Rewrite.query.count() == current_rewrites - 1
 
 
 ##############################################################################

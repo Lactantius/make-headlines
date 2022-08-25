@@ -218,6 +218,16 @@ def safe_commit(obj: object | None) -> tuple[str, object]:
     return ("success", obj)
 
 
+def safe_delete(obj: object) -> str:
+    try:
+        db.session.delete(obj)
+        db.session.commit()
+        return "success"
+    except IntegrityError:
+        db.session.rollback()
+        return "failure"
+
+
 def new_anon_user():
     """
     Register a user with placeholders for username and email, so that rewrites can be stored in the database.

@@ -17,6 +17,7 @@ from server.models import (
     new_user,
     new_headline,
     authenticate_user,
+    safe_delete,
     serialize,
 )
 from server import create_app
@@ -84,6 +85,14 @@ def test_new_rewrite(add_rewrite: Rewrite) -> None:
     assert r.headline.text == "A great thing happened"
     assert len(r.headline.rewrites) > 0
     assert Rewrite.query.count() == 3
+
+
+def test_delete_rewrite(add_rewrite: Rewrite) -> None:
+    """Can a rewrite be deleted?"""
+
+    current_rewrites = Rewrite.query.count()
+    safe_delete(add_rewrite)
+    assert Rewrite.query.count() == current_rewrites - 1
 
 
 ##############################################################################

@@ -34,6 +34,7 @@ from server.models import (
     new_anon_user,
     new_rewrite,
     new_user,
+    safe_delete,
     serialize,
     Failure,
     safe_commit,
@@ -65,7 +66,7 @@ def rate_limit(route):
             anon_user = new_anon_user()
             committed_anon = safe_commit(anon_user)
 
-            session["requests_remaining"] = 2
+            session["requests_remaining"] = 9
             session["user_id"] = committed_anon[1].id
             return route(*args, **kwargs, current_user=committed_anon[1].id)
 
@@ -123,6 +124,26 @@ def submit_rewrite(current_user: UUID) -> tuple[Response, int]:
         return (jsonify(error="Error saving to database."), 500)
 
     return (jsonify(rewrite=serialize(committed_rewrite[1])), 201)
+
+
+@app.delete("/api/rewrites/<uuid:rewrite_id>")
+@get_user
+def delete_rewrite(rewrite_id, current_user: User):
+    """Delete a rewrite"""
+
+    rewrite = Failure(rewrite_id).bind(Rewrite.query.get)
+    if not rewrite.value:
+        return (jsonify(error="Rewrite not found."), 404)
+
+    if current_user != rewrite.value.user:
+        return (jsonify(error="You do not have access to this resource."), 403)
+
+    msg = safe_delete(rewrite.value)
+
+    if msg == "success":
+        return (jsonify(success="Rewrite deleted."), 200)
+
+    return (jsonify(error="Rewrite could not be deleted."), 500)
 
 
 @app.get("/api/headlines/random")
