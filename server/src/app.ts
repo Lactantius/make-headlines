@@ -106,6 +106,9 @@ async function showRewrite(
 
   container.append(heading);
   container.append(makeSentimentGraph(rewrite.sentiment_score));
+  container.append(
+    makeDifferenceGraph(rewrite.sentiment_match, rewrite.sentiment_score)
+  );
   container.style.display = "block";
 }
 
@@ -115,6 +118,23 @@ function formatRewrite(data: Rewrite): string {
 
 function calculateScore(match: number): number {
   return Math.round(Math.abs(match) * 100);
+}
+
+function makeDifferenceGraph(match: number, score: number): HTMLDivElement {
+  const graph = document.createElement("div");
+  graph.classList.add("difference-graph");
+
+  const diff = calculateScore(match);
+
+  const text = document.createElement("span");
+  text.innerText = `Difference: ${diff}`;
+
+  const bar = document.createElement("div");
+  bar.setAttribute("style", `width: ${diff / 2}%`);
+
+  graph.append(text);
+  graph.append(bar);
+  return graph;
 }
 
 function sendRewrite(

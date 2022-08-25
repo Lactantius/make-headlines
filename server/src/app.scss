@@ -1,6 +1,8 @@
 $button-color: #2288ff;
 $mobile: 950px;
 $form-font-size: 2.5rem;
+$graph-height: 4rem;
+$graph-background-color: #aa8;
 
 :root {
   font-size: 62.5%;
@@ -42,6 +44,7 @@ button {
   justify-items: center;
   margin-top: 5rem;
   margin-bottom: 5rem;
+  font-size: 2.5rem;
 
   a {
     font-family: "Oswald", sans-serif;
@@ -118,8 +121,9 @@ button {
   gap: 1rem;
   width: 100%;
   font-weight: 400;
-  height: 3.5rem;
+  height: $graph-height;
   margin-top: 2rem;
+  background-color: $graph-background-color;
   .sentiment-bar {
     color: white;
     width: 100%;
@@ -140,7 +144,7 @@ button {
     grid-column: 3;
   }
   .active-bar {
-    height: 3.5rem;
+    height: $graph-height;
   }
   .negative-text {
     grid-column: 1;
@@ -152,6 +156,28 @@ button {
     grid-column: 3;
     margin-left: 1rem;
     z-index: 1;
+  }
+}
+
+.difference-graph {
+  width: 100%;
+  height: $graph-height;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  margin-top: 1rem;
+  background-color: $graph-background-color;
+  span {
+    grid-column: 1;
+    grid-row: 1;
+    z-index: 1;
+    text-align: center;
+  }
+  div {
+    background-color: yellow;
+    height: $graph-height;
+    grid-column: 1;
+    grid-row: 1;
   }
 }
 
