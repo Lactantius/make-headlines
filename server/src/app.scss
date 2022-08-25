@@ -50,6 +50,7 @@ button {
     text-decoration: none;
     color: black;
     margin-bottom: 2rem;
+    min-width: 60%;
 
     h2 {
       display: flex;
@@ -102,6 +103,52 @@ button {
     li {
       margin-top: 1rem;
     }
+  }
+}
+
+.sentiment-graph {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr auto 1fr;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  font-weight: 400;
+  height: 3.5rem;
+  margin-top: 2rem;
+  .sentiment-bar {
+    color: white;
+    width: 100%;
+    text-align: center;
+    grid-row: 1;
+  }
+  .negative-sentiment-bar {
+    background-color: #ff4422;
+    justify-self: end;
+    grid-column: 1;
+  }
+  span {
+    grid-row: 1;
+    grid-column: 2;
+  }
+  .positive-sentiment-bar {
+    background-color: #44ff22;
+    grid-column: 3;
+  }
+  .active-bar {
+    height: 3.5rem;
+  }
+  .negative-text {
+    grid-column: 1;
+    text-align: end;
+    margin-right: 1rem;
+    z-index: 1;
+  }
+  .positive-text {
+    grid-column: 3;
+    margin-left: 1rem;
+    z-index: 1;
   }
 }
 
@@ -247,6 +294,10 @@ p {
   font-size: inherit;
 }
 
+input {
+  padding: 1rem;
+}
+
 @media screen and (max-width: $mobile) {
   main {
     margin: 2rem;
@@ -256,6 +307,9 @@ p {
   }
 
   .rewrite-container {
+    a {
+      width: 90%;
+    }
     form {
       flex-direction: column;
       row-gap: 1.5rem;

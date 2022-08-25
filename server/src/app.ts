@@ -13,7 +13,6 @@ function addIndexPageListeners(
   rewriteFormInput: HTMLInputElement,
   mainHeadlineElement: HTMLHeadingElement,
   switchHeadlineForm: HTMLFormElement,
-  mainSentimentPar: HTMLParagraphElement,
   mainHeadlineLink: HTMLAnchorElement,
   oldRewritesContainer: HTMLDivElement
 ): void {
@@ -34,18 +33,53 @@ function addIndexPageListeners(
       mainRewriteContainer,
       oldRewritesContainer
     );
-    showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
+    showHeadline(mainHeadlineElement, mainHeadlineLink);
   });
 }
 
 /*
- * Main Form Functions
+ * Interfaces
  */
+
+interface Rewrite {
+  id: string;
+  headline_id: string;
+  user_id: string;
+  text: string;
+  timestamp: string;
+  semantic_score: number;
+  sentiment_match: number;
+  semantic_match: number;
+  sentiment_score: number;
+}
 
 interface RewriteRequest {
   text: string;
   headline_id: string;
 }
+
+interface RewriteResponse {
+  rewrite: Rewrite;
+}
+
+interface ErrorResponse {
+  error: string;
+}
+
+interface Headline {
+  id: string;
+  text: string;
+  sentiment_score: number;
+  date: string;
+  source_id: string;
+  source: string;
+  url: string;
+  rewrites?: Rewrite[];
+}
+
+/*
+ * Main Form Functions
+ */
 
 async function rewriteFormHandler(
   rewriteList: HTMLUListElement,
@@ -60,26 +94,6 @@ async function rewriteFormHandler(
   "error" in rewrite
     ? showLoginPrompt(rewrite.error, rewriteList)
     : showRewrite(rewrite, rewriteList);
-}
-
-interface RewriteResponse {
-  rewrite: Rewrite;
-}
-
-interface Rewrite {
-  id: string;
-  headline_id: string;
-  user_id: string;
-  text: string;
-  timestamp: string;
-  semantic_score: number;
-  sentiment_match: number;
-  semantic_match: number;
-  sentiment_score: number;
-}
-
-interface ErrorResponse {
-  error: string;
 }
 
 function showRewrite(
@@ -123,7 +137,6 @@ function sendRewrite(
 
 async function showHeadline(
   heading: HTMLHeadingElement,
-  sentimentPar: HTMLParagraphElement,
   container: HTMLAnchorElement,
   headlineData?: Headline
 ): Promise<void> {
@@ -132,14 +145,19 @@ async function showHeadline(
   heading.dataset.id = headline.id;
   container.setAttribute("href", headline.url);
 
+  const sentimentGraph = container.querySelector(".sentiment-graph");
+  if (sentimentGraph) {
+    sentimentGraph.remove();
+  }
+  //(container.querySelector(".sentiment-graph") as HTMLDivElement).remove();
+
   const source = document.createElement("span");
   source.classList.add("headline-source");
   source.innerText = ` Source: ${headline.source} `;
   heading.append(source);
 
-  sentimentPar.innerText = calculateAffect(headline.sentiment_score);
   container.append(heading);
-  container.append(sentimentPar);
+  container.append(makeSentimentGraph(headline.sentiment_score));
 }
 
 function calculateAffect(score: number): string {
@@ -151,6 +169,43 @@ function calculateAffect(score: number): string {
   } else {
     return "Neutral";
   }
+}
+
+function makeSentimentGraph(sentiment: number): HTMLDivElement {
+  const rounded = Math.round(sentiment * 100);
+  const graph = document.createElement("div");
+  graph.classList.add("sentiment-graph");
+
+  const negative = document.createElement("div");
+  negative.classList.add("sentiment-bar", "negative-sentiment-bar");
+
+  const positive = document.createElement("div");
+  positive.classList.add("sentiment-bar", "positive-sentiment-bar");
+
+  const midpoint = document.createElement("span");
+  midpoint.innerText = "-";
+
+  const text = document.createElement("span");
+
+  if (rounded < 0) {
+    text.innerText = `Negative (${String(rounded * -1)}% certainty)`;
+    text.classList.add("negative-text");
+    negative.classList.add("active-bar");
+    negative.setAttribute("style", `width: ${rounded * -1}%`);
+  } else if (rounded > 0) {
+    text.innerText = `Positive (${String(rounded)}% certainty)`;
+    text.classList.add("positive-text");
+    positive.classList.add("active-bar");
+    positive.setAttribute("style", `width: ${rounded}%`);
+  }
+
+  graph.append(text);
+
+  graph.append(negative);
+  graph.append(midpoint);
+  graph.append(positive);
+
+  return graph;
 }
 
 function getHeadline() {
@@ -209,17 +264,6 @@ function removeIds(node: Element): void {
  * Rewrites Page: Functions for getting and displaying all of a user's old rewrites
  */
 
-interface Headline {
-  id: string;
-  text: string;
-  sentiment_score: number;
-  date: string;
-  source_id: string;
-  source: string;
-  url: string;
-  rewrites?: Rewrite[];
-}
-
 async function showOldRewrites(): Promise<void> {
   const allHeadlinesContainer = document.querySelector(
     "#previous-rewrites-container"
@@ -239,8 +283,7 @@ async function showOldRewrites(): Promise<void> {
     hContainer.classList.add("rewrite-container");
     const link = document.createElement("a");
     const hElement = document.createElement("h2");
-    const sentimentPar = document.createElement("p");
-    showHeadline(hElement, sentimentPar, link, headline);
+    showHeadline(hElement, link, headline);
     hContainer.append(link);
 
     const rewrites = document.createElement("ul");
@@ -329,17 +372,13 @@ function setupIndexPage(): void {
     "a"
   ) as HTMLAnchorElement;
 
-  const mainSentimentPar = mainRewriteContainer.querySelector(
-    "p"
-  ) as HTMLParagraphElement;
-
   const oldRewritesContainer = document.querySelector(
     "#old-rewrites"
   ) as HTMLDivElement;
 
   (rewriteForm.querySelector("#text") as HTMLInputElement).focus();
 
-  showHeadline(mainHeadlineElement, mainSentimentPar, mainHeadlineLink);
+  showHeadline(mainHeadlineElement, mainHeadlineLink);
   addIndexPageListeners(
     rewriteForm,
     mainRewriteDisplay,
@@ -347,7 +386,6 @@ function setupIndexPage(): void {
     rewriteFormInput,
     mainHeadlineElement,
     switchHeadlineForm,
-    mainSentimentPar,
     mainHeadlineLink,
     oldRewritesContainer
   );
