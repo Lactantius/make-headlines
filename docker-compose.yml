@@ -8,7 +8,7 @@ services:
       STAGE: ${STAGE}
       SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}"
       FLASK_SECRET: ${FLASK_SECRET}
-    image: lactantius/makeheadlines:0.3
+    image: lactantius/makeheadlines:0.5
     networks:
       - default
     ports:

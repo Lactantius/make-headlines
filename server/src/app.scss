@@ -139,7 +139,7 @@ button {
     grid-row: 1;
   }
   .negative-sentiment-bar {
-    background-color: #ff4422;
+    background-color: #c40;
     justify-self: end;
     grid-column: 1;
   }
@@ -148,7 +148,7 @@ button {
     grid-column: 2;
   }
   .positive-sentiment-bar {
-    background-color: #44ff22;
+    background-color: #4a0;
     grid-column: 3;
   }
   .active-bar {
@@ -184,7 +184,7 @@ button {
     text-align: center;
   }
   div {
-    background-color: yellow;
+    background-color: #dd8;
     height: $graph-height;
     grid-column: 1;
     grid-row: 1;
@@ -342,7 +342,7 @@ p {
 }
 
 .delete-btn {
-  background-color: #ff4422;
+  background-color: #c40;
   width: 4rem;
   height: 4rem;
   justify-self: end;
