@@ -1,16 +1,38 @@
 #+title: Readme
 
-Rewrite headlines from news organizations to change the positive/negative sentiment.
+Rewrite headlines from news organizations to change the positive/negative sentiment. Hosted at https://makeheadlines.gerardkeiser.com.
 
-** Install/Deploy
+* Features and Usage
 
-1. Download [[https://nlp.informatik.hu-berlin.de/resources/models/sentiment-curated-distilbert/sentiment-en-mix-distillbert_4.pt][the very large sentiment model]], or some other model, to ~server/models/~. (It will otherwise download it automatically, but you will have to do that every time you build a docker image.)
-2. Change the secrets in ~.env~
-3. ~docker compose up~
-4. ~docker exec sentimental-headlines-web-1 python3 -m server.seed~ (Will make this unnecessary soon.)
-5. Served at localhost:5000. It must be changed in both ~gunicorn.config.py~ and ~docker-compose.yml~.
+Make Headlines pulls in headlines from the RSS feeds of news providers (currently just /The New York Times/ and /The Wall Street Journal/) and analyzes them with sentiment model. On the main page it shows visitors a single random headline along with the sentiment (positive or negative) and the certainty score. The visitor can then write new wording for the headline and try to change the sentiment, or at least the certainty.
 
-** TODO
+Anonymous users are limited to ten rewrite attempts; to continue they must create a login, which will let them view all of their previous rewrite attempts.
+
+* Implementation
+
+The server is written in Python with Flask, tested with pytest, and uses a PostgreSQL database; the frontend uses Sass and TypeScript.
+
+For sentiment analysis this uses the Python [[https://github.com/flairnlp/flair][Flair library]] and the [[https://nlp.informatik.hu-berlin.de/resources/models/sentiment-curated-distilbert/sentiment-en-mix-distillbert_4.pt][default model]].
+
+* Install/Deploy
+
+Note that Flair pulls in a very large number of dependencies, and the model itself is quite large. The Docker image is about 3.3GB, and expect it to take more than 1GB of RAM when pulling in more headlines, and ~650MB idling.
+
+** Docker Compose
+1. Set environment variables in ~docker-compose.yml~
+2. ~docker compose up~
+3. ~docker exec sentimental-headlines-web-1 python3 -m server.seed~ (Pulls in initial headlines. If left running, it will pull in more every three hours.)
+4. Served at localhost:5000. It must be changed in both ~gunicorn.config.py~ and ~docker-compose.yml~.
+
+** Local
+
+If you want to build it yourself, download [[https://nlp.informatik.hu-berlin.de/resources/models/sentiment-curated-distilbert/sentiment-en-mix-distillbert_4.pt][the very large sentiment model]], or some other model, to ~server/models/~. (It will otherwise download it automatically, but you will have to do that every time you build a docker image.)
+
+1. Install dependencies and add database (default name is ~headlines_test~)
+2. ~python3 -m server.seed~ (When run this way, it will fully reset the database.)
+3. ~flask run~
+
+* TODO
 
 - [x] Regularly re-run seed headlines function
 - [x] User validations
@@ -32,6 +54,8 @@ Rewrite headlines from news organizations to change the positive/negative sentim
   - [ ] Password recovery
   - [x] Profile page with edit features
   - [x] Password editing
+  - [ ] Search functionality
+  - [ ] Add more rewrites to old headlines
 - [ ] Interesting features
   - [ ] Calculate semantic match
   - [ ] More news sources
