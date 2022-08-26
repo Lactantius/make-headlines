@@ -109,8 +109,8 @@ async function showRewrite(
 
   const deleteButton = makeDeleteButton(rewrite.id, rewriteDiv);
 
-  rewriteDiv.append(heading);
   rewriteDiv.append(deleteButton);
+  rewriteDiv.append(heading);
   rewriteDiv.append(makeSentimentGraph(rewrite.sentiment_score));
   rewriteDiv.append(
     makeDifferenceGraph(rewrite.sentiment_match, rewrite.sentiment_score)

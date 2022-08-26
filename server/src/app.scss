@@ -380,6 +380,17 @@ input {
     }
     ul {
       width: 90%;
+      .rewrite-div {
+        display: flex;
+        flex-direction: column;
+        margin-top: 5rem;
+        button {
+          margin-left: auto;
+        }
+        h2 {
+          margin: auto 0 auto 0;
+        }
+      }
     }
   }
 }
