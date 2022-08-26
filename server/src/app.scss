@@ -80,7 +80,7 @@ button {
     width: auto;
 
     input {
-      min-width: 60rem;
+      width: 60rem;
     }
     * {
       font-size: $form-font-size;
@@ -356,10 +356,10 @@ input {
 
 @media screen and (max-width: $mobile) {
   main {
-    margin: 2rem;
+    width: 100%;
   }
   .explainer {
-    width: 100%;
+    width: 90%;
   }
 
   .rewrite-container {
@@ -369,8 +369,13 @@ input {
     form {
       flex-direction: column;
       row-gap: 1.5rem;
+      width: 90%;
+      input {
+        width: 90%;
+        min-width: 0;
+      }
       button {
-        width: 100%;
+        width: 60%;
       }
     }
     ul {
