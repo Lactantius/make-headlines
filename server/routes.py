@@ -1,11 +1,10 @@
 """Routes"""
 
 from functools import wraps
-from uuid import uuid4, UUID
+from uuid import UUID
 import uuid
 from flask import (
     current_app as app,
-    Flask,
     Response,
     flash,
     redirect,
@@ -13,7 +12,6 @@ from flask import (
     request,
     jsonify,
     session,
-    Blueprint,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -32,10 +30,8 @@ from server.forms import (
 
 from server.models import (
     authenticate_user,
-    # db,
     User,
     Headline,
-    Source,
     Rewrite,
     change_password,
     new_anon_user,

@@ -2,11 +2,11 @@
 
 from collections.abc import Callable
 from typing import Dict
+import uuid
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import backref
-import uuid
 from flask_bcrypt import Bcrypt
 from datetime import date, datetime
 import traceback

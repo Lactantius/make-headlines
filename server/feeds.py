@@ -2,8 +2,7 @@ import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from server.models import new_headline, Headline, safe_commit  # , db
-from server import db
+from server.models import new_headline, Headline, safe_commit
 
 
 def get_nytimes_and_wsj_headlines():
