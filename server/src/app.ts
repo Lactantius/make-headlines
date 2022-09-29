@@ -18,10 +18,10 @@ function addIndexPageListeners(
 ): void {
   rewriteForm.addEventListener("submit", (evt) => {
     evt.preventDefault();
-    rewriteFormHandler(
+    void rewriteFormHandler(
       mainRewriteDisplay,
       rewriteFormInput.value,
-      mainHeadlineElement.dataset.id as string
+      mainHeadlineElement.dataset.id!
     );
     rewriteForm.reset();
   });
@@ -33,7 +33,7 @@ function addIndexPageListeners(
       mainRewriteContainer,
       oldRewritesContainer
     );
-    showHeadline(mainHeadlineElement, mainHeadlineLink);
+    void showHeadline(mainHeadlineElement, mainHeadlineLink);
   });
 }
 
@@ -53,16 +53,16 @@ interface Rewrite {
   sentiment_score: number;
 }
 
-interface RewriteRequest {
+interface RewriteReq {
   text: string;
   headline_id: string;
 }
 
-interface RewriteResponse {
+interface RewriteRes {
   rewrite: Rewrite;
 }
 
-interface ErrorResponse {
+interface ErrorRes {
   error: string;
 }
 
@@ -77,6 +77,10 @@ interface Headline {
   rewrites?: Rewrite[];
 }
 
+interface HeadlineRes {
+  headline: Headline;
+}
+
 /*
  * Main Form Functions
  */
@@ -86,20 +90,17 @@ async function rewriteFormHandler(
   text: string,
   headlineId: string
 ): Promise<void> {
-  const requestBody: RewriteRequest = {
+  const requestBody: RewriteReq = {
     text: text,
     headline_id: headlineId,
   };
   const rewrite = await sendRewrite(requestBody);
   "error" in rewrite
-    ? showLoginPrompt(rewrite.error, rewriteList)
+    ? showError(rewrite.error)
     : showRewrite(rewrite.rewrite, rewriteList);
 }
 
-async function showRewrite(
-  rewrite: Rewrite,
-  container: HTMLUListElement
-): Promise<void> {
+function showRewrite(rewrite: Rewrite, container: HTMLUListElement): void {
   const rewriteDiv = document.createElement("div");
   rewriteDiv.classList.add("rewrite-div");
 
@@ -112,9 +113,7 @@ async function showRewrite(
   rewriteDiv.append(deleteButton);
   rewriteDiv.append(heading);
   rewriteDiv.append(makeSentimentGraph(rewrite.sentiment_score));
-  rewriteDiv.append(
-    makeDifferenceGraph(rewrite.sentiment_match, rewrite.sentiment_score)
-  );
+  rewriteDiv.append(makeDifferenceGraph(rewrite.sentiment_match));
   container.style.display = "block";
   container.append(rewriteDiv);
 }
@@ -128,21 +127,17 @@ function makeDeleteButton(
   button.classList.add("delete-btn");
   button.addEventListener("click", (evt: MouseEvent) => {
     evt.preventDefault();
-    fetch(`/api/rewrites/${id}`, { method: "DELETE" });
+    void fetch(`/api/rewrites/${id}`, { method: "DELETE" });
     rewriteContainer.remove();
   });
   return button;
-}
-
-function formatRewrite(data: Rewrite): string {
-  return `${data.text} | Score: ${calculateScore(data.sentiment_match)}`;
 }
 
 function calculateScore(match: number): number {
   return Math.round(Math.abs(match) * 100);
 }
 
-function makeDifferenceGraph(match: number, score: number): HTMLDivElement {
+function makeDifferenceGraph(match: number): HTMLDivElement {
   const graph = document.createElement("div");
   graph.classList.add("difference-graph");
 
@@ -159,17 +154,15 @@ function makeDifferenceGraph(match: number, score: number): HTMLDivElement {
   return graph;
 }
 
-function sendRewrite(
-  data: RewriteRequest
-): Promise<RewriteResponse | ErrorResponse> {
+function sendRewrite(data: RewriteReq): Promise<RewriteRes | ErrorRes> {
   return fetch("/api/rewrites", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   })
     .then((p) => p.json())
-    .then((data: RewriteResponse) => data)
-    .catch((err: ErrorResponse) => err);
+    .then((data: RewriteRes) => data)
+    .catch((err: ErrorRes) => err);
 }
 
 /*
@@ -181,34 +174,29 @@ async function showHeadline(
   container: HTMLAnchorElement,
   headlineData?: Headline
 ): Promise<void> {
-  const headline = headlineData || (await getHeadline());
-  heading.innerText = headline.text;
-  heading.dataset.id = headline.id;
-  container.setAttribute("href", headline.url);
+  //const headline = headlineData ?? (await getHeadline());
+  const headline = headlineData ?? (await getHeadline());
+  console.log(headline);
+  "error" in headline
+    ? showError(headline.error)
+    : ((headline: Headline) => {
+      heading.innerText = headline.text;
+      heading.dataset.id = headline.id;
+      container.setAttribute("href", headline.url);
 
-  const sentimentGraph = container.querySelector(".sentiment-graph");
-  if (sentimentGraph) {
-    sentimentGraph.remove();
-  }
+      const sentimentGraph = container.querySelector(".sentiment-graph");
+      if (sentimentGraph) {
+        sentimentGraph.remove();
+      }
 
-  const source = document.createElement("span");
-  source.classList.add("headline-source");
-  source.innerText = ` Source: ${headline.source} `;
-  heading.append(source);
+      const source = document.createElement("span");
+      source.classList.add("headline-source");
+      source.innerText = ` Source: ${headline.source} `;
+      heading.append(source);
 
-  container.append(heading);
-  container.append(makeSentimentGraph(headline.sentiment_score));
-}
-
-function calculateAffect(score: number): string {
-  const rounded = Math.round(score * 100);
-  if (rounded < 0) {
-    return `Negative (${rounded * -1}% certainty)`;
-  } else if (rounded > 0) {
-    return `Positive (${rounded}% certainty)`;
-  } else {
-    return "Neutral";
-  }
+      container.append(heading);
+      container.append(makeSentimentGraph(headline.sentiment_score));
+    })(headline);
 }
 
 function makeSentimentGraph(sentiment: number): HTMLDivElement {
@@ -248,18 +236,18 @@ function makeSentimentGraph(sentiment: number): HTMLDivElement {
   return graph;
 }
 
-function getHeadline() {
+function getHeadline(): Promise<Headline | ErrorRes> {
   return fetch("/api/headlines/random")
     .then((res) => res.json())
-    .then((data) => data.headline)
-    .catch((err) => err);
+    .then((data: HeadlineRes) => data.headline)
+    .catch((err: ErrorRes) => err);
 }
 
 function moveHeadline(
   mainRewriteDisplay: HTMLUListElement,
   mainRewriteContainer: HTMLDivElement,
   oldRewritesContainer: HTMLDivElement
-) {
+): void {
   if (mainRewriteDisplay.children.length === 0) {
     return;
   }
@@ -281,7 +269,7 @@ function moveHeadline(
 
   form.addEventListener("submit", (evt) => {
     evt.preventDefault();
-    rewriteFormHandler(ul, input.value, headline.dataset.id as string);
+    void rewriteFormHandler(ul, input.value, headline.dataset.id as string);
     form.reset();
   });
 
@@ -295,7 +283,7 @@ function moveHeadline(
 function removeIds(node: Element): void {
   node.removeAttribute("id");
   const children = node.querySelectorAll("*");
-  for (let child of children) {
+  for (const child of children) {
     child.removeAttribute("id");
   }
 }
@@ -308,42 +296,38 @@ async function showOldRewrites(): Promise<void> {
   const allHeadlinesContainer = document.querySelector(
     "#previous-rewrites-container"
   ) as HTMLDivElement;
-  const headlines: Headline[] = await fetch(
-    "/api/users/logged_in_user/rewrites",
-    {
-      headers: { "Content-Type": "application/json" },
-    }
-  )
+  const headlines = await fetch("/api/users/logged_in_user/rewrites", {
+    headers: { "Content-Type": "application/json" },
+  })
     .then((data) => data.json())
-    .catch((err: Error) => showOldRewritesError(err));
+    .then((lines: Headline[]) => lines)
+    .catch((err: ErrorRes) => showError(err.error));
 
-  allHeadlinesContainer.replaceChildren("");
-  headlines.forEach((headline) => {
-    const hContainer = document.createElement("div");
-    hContainer.classList.add("rewrite-container");
-    const link = document.createElement("a");
-    const hElement = document.createElement("h2");
-    showHeadline(hElement, link, headline);
-    hContainer.append(link);
+  if (headlines) {
+    allHeadlinesContainer.replaceChildren("");
+    headlines.forEach((headline) => {
+      const hContainer = document.createElement("div");
+      hContainer.classList.add("rewrite-container");
+      const link = document.createElement("a");
+      const hElement = document.createElement("h2");
+      void showHeadline(hElement, link, headline);
+      hContainer.append(link);
 
-    const rewritesList = document.createElement("ul");
-    (headline.rewrites as Rewrite[]).forEach((rewrite) => {
-      showRewrite(rewrite, rewritesList);
+      const rewritesList = document.createElement("ul");
+      (headline.rewrites as Rewrite[]).forEach((rewrite) => {
+        showRewrite(rewrite, rewritesList);
+      });
+      hContainer.append(rewritesList);
+      allHeadlinesContainer.append(hContainer);
     });
-    hContainer.append(rewritesList);
-    allHeadlinesContainer.append(hContainer);
-  });
-}
-
-function showOldRewritesError(err: Error): void {
-  alert(err);
+  }
 }
 
 /*
  * Notifications
  */
 
-function showLoginPrompt(msg: string, rewriteList: HTMLUListElement): void {
+function showError(msg: string): void {
   const body = document.querySelector("body") as HTMLBodyElement;
   const prompt = document.createElement("prompt");
 
@@ -368,7 +352,6 @@ function formatErrorMessage(msg: string): HTMLSpanElement {
 }
 
 function makeCloseButton(parent: HTMLElement): HTMLButtonElement {
-  console.log("Making button");
   const button = document.createElement("button");
   button.innerText = "X";
   button.classList.add("close-btn");
@@ -418,7 +401,7 @@ function setupIndexPage(): void {
 
   (rewriteForm.querySelector("#text") as HTMLInputElement).focus();
 
-  showHeadline(mainHeadlineElement, mainHeadlineLink);
+  void showHeadline(mainHeadlineElement, mainHeadlineLink);
   addIndexPageListeners(
     rewriteForm,
     mainRewriteDisplay,
@@ -436,6 +419,6 @@ function main(): void {
   if (path === "/") {
     setupIndexPage();
   } else if (path === "/rewrites") {
-    showOldRewrites();
+    void showOldRewrites();
   }
 }
