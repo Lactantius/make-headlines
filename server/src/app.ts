@@ -21,7 +21,7 @@ function addIndexPageListeners(
     void rewriteFormHandler(
       mainRewriteDisplay,
       rewriteFormInput.value,
-      mainHeadlineElement.dataset.id!
+      mainHeadlineElement.dataset.id as string
     );
     rewriteForm.reset();
   });
