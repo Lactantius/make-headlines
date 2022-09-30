@@ -85,6 +85,7 @@ interface HeadlineRes {
  * Main Form Functions
  */
 
+/* Runs when main form is submitted */
 async function rewriteFormHandler(
   rewriteList: HTMLUListElement,
   text: string,
@@ -100,6 +101,7 @@ async function rewriteFormHandler(
     : showRewrite(rewrite.rewrite, rewriteList);
 }
 
+/* Add rewrite to DOM */
 function showRewrite(rewrite: Rewrite, container: HTMLUListElement): void {
   const rewriteDiv = document.createElement("div");
   rewriteDiv.classList.add("rewrite-div");
@@ -115,9 +117,10 @@ function showRewrite(rewrite: Rewrite, container: HTMLUListElement): void {
   rewriteDiv.append(makeSentimentGraph(rewrite.sentiment_score));
   rewriteDiv.append(makeDifferenceGraph(rewrite.sentiment_match));
   container.style.display = "block";
-  container.append(rewriteDiv);
+  container.prepend(rewriteDiv);
 }
 
+/* Delete button for headline rewrites */
 function makeDeleteButton(
   id: string,
   rewriteContainer: HTMLDivElement
@@ -128,6 +131,10 @@ function makeDeleteButton(
   button.addEventListener("click", (evt: MouseEvent) => {
     evt.preventDefault();
     void fetch(`/api/rewrites/${id}`, { method: "DELETE" });
+    /* Hide list of rewrites if this is the last one */
+    if (rewriteContainer.parentElement!.childElementCount === 1) {
+      rewriteContainer.parentElement!.style.display = "none";
+    }
     rewriteContainer.remove();
   });
   return button;
@@ -137,6 +144,7 @@ function calculateScore(match: number): number {
   return Math.round(Math.abs(match) * 100);
 }
 
+/* Graph shown under rewrites */
 function makeDifferenceGraph(match: number): HTMLDivElement {
   const graph = document.createElement("div");
   graph.classList.add("difference-graph");
