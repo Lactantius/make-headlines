@@ -162,6 +162,7 @@ function makeDifferenceGraph(match: number): HTMLDivElement {
   return graph;
 }
 
+/* API Request to get sentiment analysis */
 function sendRewrite(data: RewriteReq): Promise<RewriteRes | ErrorRes> {
   return fetch("/api/rewrites", {
     method: "POST",
@@ -177,12 +178,12 @@ function sendRewrite(data: RewriteReq): Promise<RewriteRes | ErrorRes> {
  * Replace headlines
  */
 
+/* Add headline to DOM */
 async function showHeadline(
   heading: HTMLHeadingElement,
   container: HTMLAnchorElement,
   headlineData?: Headline
 ): Promise<void> {
-  //const headline = headlineData ?? (await getHeadline());
   const headline = headlineData ?? (await getHeadline());
   console.log(headline);
   "error" in headline
@@ -207,6 +208,7 @@ async function showHeadline(
     })(headline);
 }
 
+/* Generates a graph of the sentiment score */
 function makeSentimentGraph(sentiment: number): HTMLDivElement {
   const rounded = Math.round(sentiment * 100);
   const graph = document.createElement("div");
@@ -244,6 +246,7 @@ function makeSentimentGraph(sentiment: number): HTMLDivElement {
   return graph;
 }
 
+/* API request for a headline */
 function getHeadline(): Promise<Headline | ErrorRes> {
   return fetch("/api/headlines/random")
     .then((res) => res.json())
@@ -251,6 +254,7 @@ function getHeadline(): Promise<Headline | ErrorRes> {
     .catch((err: ErrorRes) => err);
 }
 
+/* Move the headline beneath the main form (for when the user wants to switch the headline) */
 function moveHeadline(
   mainRewriteDisplay: HTMLUListElement,
   mainRewriteContainer: HTMLDivElement,
@@ -259,7 +263,6 @@ function moveHeadline(
   if (mainRewriteDisplay.children.length === 0) {
     return;
   }
-  //(rewriteContainer.querySelector("p") as HTMLParagraphElement).remove();
   const oldHeadline = mainRewriteContainer.cloneNode(true) as HTMLDivElement;
   mainRewriteDisplay.replaceChildren("");
   mainRewriteDisplay.style.display = "none";
@@ -288,6 +291,7 @@ function moveHeadline(
   oldRewritesContainer.prepend(oldHeadline);
 }
 
+/* The main headline DIV has IDs used for event handling, so they are removed when the headline is switched */
 function removeIds(node: Element): void {
   node.removeAttribute("id");
   const children = node.querySelectorAll("*");
@@ -300,6 +304,7 @@ function removeIds(node: Element): void {
  * Rewrites Page: Functions for getting and displaying all of a user's old rewrites
  */
 
+/* Get all the user's old rewrites and add them to the DOM */
 async function showOldRewrites(): Promise<void> {
   const allHeadlinesContainer = document.querySelector(
     "#previous-rewrites-container"
@@ -335,6 +340,7 @@ async function showOldRewrites(): Promise<void> {
  * Notifications
  */
 
+/* Makes a div with error messages */
 function showError(msg: string): void {
   const body = document.querySelector("body") as HTMLBodyElement;
   const prompt = document.createElement("prompt");
@@ -348,6 +354,7 @@ function showError(msg: string): void {
   body.append(prompt);
 }
 
+/* Rewrite some of the server's errors */
 function formatErrorMessage(msg: string): HTMLSpanElement {
   const span = document.createElement("span");
   if (msg === "Please login before making additional requests.") {
@@ -359,6 +366,7 @@ function formatErrorMessage(msg: string): HTMLSpanElement {
   return span;
 }
 
+/* To remove the error div */
 function makeCloseButton(parent: HTMLElement): HTMLButtonElement {
   const button = document.createElement("button");
   button.innerText = "X";
