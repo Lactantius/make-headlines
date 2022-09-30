@@ -219,7 +219,7 @@ def change_password(user: User, new_password: str) -> str:
 
 
 def safe_commit(obj: object | None) -> tuple[str, object]:
-    # return Failure(obj).bind(db.session.add).bind(db.session.commit)
+    # Possibly convert to something like return Failure(obj).bind(db.session.add).bind(db.session.commit)
     if obj:
         db.session.add(obj)
     try:
@@ -314,7 +314,7 @@ def serialize(
 class Failure:
     """Monad from https://www.philliams.com/monads-in-python"""
 
-    def __init__(self, value: object = None, errors: Dict = None):
+    def __init__(self, value: object = None, errors: Dict | None = None):
         self.value = value
         self.errors = errors
 
