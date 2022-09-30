@@ -2,6 +2,7 @@
 
 from functools import wraps
 from uuid import UUID
+from datetime import date, timedelta
 import uuid
 from flask import (
     current_app as app,
@@ -154,7 +155,15 @@ def get_random_headline() -> tuple[Response, int]:
     """Get a random headline"""
 
     # From https://stackoverflow.com/a/33583008/6632828
-    headline = Headline.query.order_by(func.random()).first()
+    headline = (
+        Headline.query.filter(
+            func.date(Headline.date).between(
+                date.today() - timedelta(days=4), date.today()
+            )
+        )
+        .order_by(func.random())
+        .first()
+    )
     return (jsonify(headline=serialize(headline)), 200)
 
 
