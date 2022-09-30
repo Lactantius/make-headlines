@@ -21,7 +21,7 @@ function addIndexPageListeners(
     void rewriteFormHandler(
       mainRewriteDisplay,
       rewriteFormInput.value,
-      mainHeadlineElement.dataset.id as string
+      mainHeadlineElement.dataset.id!
     );
     rewriteForm.reset();
   });
@@ -96,9 +96,7 @@ async function rewriteFormHandler(
     headline_id: headlineId,
   };
   const rewrite = await sendRewrite(requestBody);
-  "error" in rewrite
-    ? showError(rewrite.error)
-    : showRewrite(rewrite.rewrite, rewriteList);
+  if (rewrite) showRewrite(rewrite.rewrite, rewriteList);
 }
 
 /* Add rewrite to DOM */
@@ -162,18 +160,6 @@ function makeDifferenceGraph(match: number): HTMLDivElement {
   return graph;
 }
 
-/* API Request to get sentiment analysis */
-function sendRewrite(data: RewriteReq): Promise<RewriteRes | ErrorRes> {
-  return fetch("/api/rewrites", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  })
-    .then((p) => p.json())
-    .then((data: RewriteRes) => data)
-    .catch((err: ErrorRes) => err);
-}
-
 /*
  * Replace headlines
  */
@@ -185,27 +171,24 @@ async function showHeadline(
   headlineData?: Headline
 ): Promise<void> {
   const headline = headlineData ?? (await getHeadline());
-  console.log(headline);
-  "error" in headline
-    ? showError(headline.error)
-    : ((headline: Headline) => {
-      heading.innerText = headline.text;
-      heading.dataset.id = headline.id;
-      container.setAttribute("href", headline.url);
+  if (headline) {
+    heading.innerText = headline.text;
+    heading.dataset.id = headline.id;
+    container.setAttribute("href", headline.url);
 
-      const sentimentGraph = container.querySelector(".sentiment-graph");
-      if (sentimentGraph) {
-        sentimentGraph.remove();
-      }
+    const sentimentGraph = container.querySelector(".sentiment-graph");
+    if (sentimentGraph) {
+      sentimentGraph.remove();
+    }
 
-      const source = document.createElement("span");
-      source.classList.add("headline-source");
-      source.innerText = ` Source: ${headline.source} `;
-      heading.append(source);
+    const source = document.createElement("span");
+    source.classList.add("headline-source");
+    source.innerText = ` Source: ${headline.source} `;
+    heading.append(source);
 
-      container.append(heading);
-      container.append(makeSentimentGraph(headline.sentiment_score));
-    })(headline);
+    container.append(heading);
+    container.append(makeSentimentGraph(headline.sentiment_score));
+  }
 }
 
 /* Generates a graph of the sentiment score */
@@ -246,14 +229,6 @@ function makeSentimentGraph(sentiment: number): HTMLDivElement {
   return graph;
 }
 
-/* API request for a headline */
-function getHeadline(): Promise<Headline | ErrorRes> {
-  return fetch("/api/headlines/random")
-    .then((res) => res.json())
-    .then((data: HeadlineRes) => data.headline)
-    .catch((err: ErrorRes) => err);
-}
-
 /* Move the headline beneath the main form (for when the user wants to switch the headline) */
 function moveHeadline(
   mainRewriteDisplay: HTMLUListElement,
@@ -267,7 +242,7 @@ function moveHeadline(
   mainRewriteDisplay.replaceChildren("");
   mainRewriteDisplay.style.display = "none";
   /* Remove button to switch the headline */
-  (oldHeadline.querySelector("#switch-headline") as HTMLFormElement).remove();
+  oldHeadline.querySelector("#switch-headline")!.remove();
 
   removeIds(oldHeadline);
 
@@ -280,7 +255,7 @@ function moveHeadline(
 
   form.addEventListener("submit", (evt) => {
     evt.preventDefault();
-    void rewriteFormHandler(ul, input.value, headline.dataset.id as string);
+    void rewriteFormHandler(ul, input.value, headline.dataset.id!);
     form.reset();
   });
 
@@ -309,12 +284,7 @@ async function showOldRewrites(): Promise<void> {
   const allHeadlinesContainer = document.querySelector(
     "#previous-rewrites-container"
   ) as HTMLDivElement;
-  const headlines = await fetch("/api/users/logged_in_user/rewrites", {
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((data) => data.json())
-    .then((lines: Headline[]) => lines)
-    .catch((err: ErrorRes) => showError(err.error));
+  const headlines = await getAllHeadlines();
 
   if (headlines) {
     allHeadlinesContainer.replaceChildren("");
@@ -376,6 +346,40 @@ function makeCloseButton(parent: HTMLElement): HTMLButtonElement {
     parent.remove();
   });
   return button;
+}
+
+/*
+ * API Requests
+ */
+
+/* API request for a headline */
+function getHeadline(): Promise<Headline | void> {
+  return fetch("/api/headlines/random")
+    .then((res) => res.json())
+    .then((data: HeadlineRes) => data.headline)
+    .catch((err: ErrorRes) => showError(err.error));
+}
+
+/* API request to get sentiment analysis */
+function sendRewrite(data: RewriteReq): Promise<RewriteRes | void> {
+  return fetch("/api/rewrites", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+    .then((p) => p.json())
+    .then((data: RewriteRes) => data)
+    .catch((err: ErrorRes) => showError(err.error));
+}
+
+/* API request for getting all of a user's headlines */
+function getAllHeadlines(): Promise<Headline[] | void> {
+  return fetch("/api/users/logged_in_user/rewrites", {
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((data) => data.json())
+    .then((lines: Headline[]) => lines)
+    .catch((err: ErrorRes) => showError(err.error));
 }
 
 /*
